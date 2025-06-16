@@ -1,0 +1,13 @@
+# Ignore backend files
+Backend/node_modules/
+Backend/.env
+
+# Ignore frontend files (note: case-sensitive)
+Frontend/node_modules/
+Frontend/.env
+
+# Ignore logs, system files, and builds
+*.log
+.DS_Store
+dist/
+build/
