@@ -151,7 +151,7 @@ const OtpVerificationPage: React.FC = () => {
         {/* OTP Expiration Message */}
         {!hideOtpExpirationText && (
           <div className="mb-4 text-lg text-gray-700">
-            OTP will expire in: {formatTime(timer)}
+            Resend the OTP in : {formatTime(timer)}
           </div>
         )}
 

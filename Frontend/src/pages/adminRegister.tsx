@@ -103,6 +103,7 @@ const AdminSignIn: React.FC = () => {
         setLoading(false);
         navigate("/admin/otp");
       } catch (error: unknown) {
+        setLoading(false)
         if (error instanceof Error) {
           if (error.message === "Email already exists") {
             toast.error("Email already exists");

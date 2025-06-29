@@ -12,7 +12,7 @@ import "../css/tailwind.css";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import io, { Socket } from "socket.io-client";
 import { toast } from "react-toastify";
-import { setAdminCredentials } from "../redux/Slices/AdminAuth";
+import { adminLogout, setAdminCredentials } from "../redux/Slices/AdminAuth";
 import AdminLeftNavBar from "../components/admin-left-nav";
 import { MailIcon } from "lucide-react";
 import AdminProjectSidebar from "../components/admin-midnav";
@@ -21,6 +21,7 @@ import AdminDashboard from "../components/admin-dashboard";
 import AdminTaskDetails from "../components/admin-task-details";
 import Notifications from "../components/notifications";
 import {
+  adminLogoutService,
   fetchAdminNotifications,
   saveCompanyDetails,
 } from "../services/adminApi/adminAuthService";
@@ -37,6 +38,7 @@ export default function AdminHome() {
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "tasks" | "notifications"
   >("dashboard");
+
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [step, setStep] = useState<number>(1);
@@ -50,7 +52,6 @@ export default function AdminHome() {
 
   const validationHandlers = [
     () => {
-      // Validation for step 1: Company Name
       if (
         !companyName.trim() || // Check if the input is empty or whitespace
         /^\d+$/.test(companyName) || // Check if the input is all digits
@@ -76,6 +77,18 @@ export default function AdminHome() {
       return true;
     },
   ];
+
+   const handleLogout = async () => {
+    try {
+      await adminLogoutService();
+      dispatch(adminLogout());
+      navigate("/admin/login");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
+    }
+  };
   const fetchNotifications = async () => {
     try {
       const data = await fetchAdminNotifications();
@@ -150,6 +163,11 @@ export default function AdminHome() {
         setIsOpenModal(false);
       }, 3000);
     } catch (error) {
+      if (error instanceof Error) {
+        if(error.message == "Company data already exists"){
+          handleLogout()
+        }
+      }
       console.error("Error submitting company details:", error);
       toast.error(`${error}`);
     }
@@ -229,9 +247,11 @@ export default function AdminHome() {
                     onChange={(e) => setCompanyName(e.target.value)}
                     className="w-full p-2 border rounded mb-4"
                   />
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded"
+                   onClick={handleLogout}>Back</button>
                   <button
                     onClick={handleNext}
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                    className="ml-2 px-4 py-2 bg-blue-600 text-white rounded"
                   >
                     Next
                   </button>
