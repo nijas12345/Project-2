@@ -1,9 +1,9 @@
-import { INotification  } from "./commonInterface";
+import { NotificationDoc, NotificationInput } from "../Model/notificationModal";
 
 export interface INotificationRepository{
-  saveNotification(notification:INotification):Promise<{message:string,assignedUserId:string}>
-  getNotifications(user_id:string):Promise<INotification[]>
-  getAdminNotifications(admin_id:string):Promise<INotification[]>
-  getNotificationsCount(user_id:string):Promise<INotification[]>
-  adminNotificationsCount(admin_id:string):Promise<INotification[]>  
+  saveNotification(notification:NotificationInput):Promise<{message:string,assignedUserId:string}>
+  getNotifications(user_id:string):Promise<NotificationDoc[]>
+  getAdminNotifications(admin_id:string):Promise<NotificationDoc[]>
+  getNotificationsCount(user_id:string):Promise<NotificationDoc[]>
+  adminNotificationsCount(admin_id:string):Promise<NotificationDoc[]>  
 }

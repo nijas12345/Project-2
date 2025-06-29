@@ -1,7 +1,6 @@
-import { Schema, model } from "mongoose";
-import { IPayment } from "../Interfaces/commonInterface";
+import { InferSchemaType, Schema, Types, model } from "mongoose";
 
-const paymentSchema: Schema = new Schema<IPayment>({
+const paymentSchema = new Schema({
   admin_id: {
     type: String,
     ref: "Admin",
@@ -17,6 +16,7 @@ const paymentSchema: Schema = new Schema<IPayment>({
   },
   status: {
     type: String,
+    enum: ["active","expired","pending","canceled"],
     default: "pending",
   },
   created_at: {
@@ -28,5 +28,8 @@ const paymentSchema: Schema = new Schema<IPayment>({
   },
 });
 
-const Payment = model<IPayment>("Payment", paymentSchema);
-export default Payment;
+export type PaymentInput = InferSchemaType<typeof paymentSchema>
+export type PaymentDoc = PaymentInput & {_id:Types.ObjectId}
+
+const paymentModel = model<PaymentDoc>("Payment", paymentSchema);
+export default paymentModel

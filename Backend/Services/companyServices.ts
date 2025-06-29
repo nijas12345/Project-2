@@ -1,13 +1,10 @@
 import { sendInvitationLink } from "../Config/email_config";
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
+import { AdminDoc } from "../Model/adminModal";
+import { CompanyDoc,CompanyInput,CompanyMemberDoc } from "../Model/companyModal";
 import {
-  IAdmin,
-  ICompany,
-  ICompanyMember,
   IMember,
   IPayment,
-  IProject,
-  IUser,
 } from "../Interfaces/commonInterface";
 import { ICompanyRepository } from "../Interfaces/company.repository.interface";
 import { ICompanyService } from "../Interfaces/company.service.interface";
@@ -16,6 +13,9 @@ import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { IPaymentRepository } from "../Interfaces/payment.repository.interface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import { UserDoc } from "../Model/userModal";
+import { MemberInput, ProjectDoc } from "../Model/projectModal";
+import { PaymentDoc } from "../Model/paymentModal";
 class CompanyServices implements ICompanyService {
   private companyRepository: ICompanyRepository;
   private adminRepository: IAdminRepository;
@@ -36,17 +36,18 @@ class CompanyServices implements ICompanyService {
     this.paymentRepository = paymentRepository;
   }
   companyDetails = async (
-    companyData: ICompany,
+    companyData: CompanyInput,
     admin_id: string
-  ): Promise<IAdmin> => {
+  ): Promise<AdminDoc> => {
     const companyTwoAlphabets = companyData.companyName.slice(0, 2);
-    const generatedOtp: string = Math.floor(
+    const generatedOtp: string = Math
+    .floor(
       1000 + Math.random() * 9000
     ).toString();
     const refferalCode: string = companyTwoAlphabets + generatedOtp;
     companyData.refferalCode = refferalCode;
     const companyName: string = companyData.companyName;
-    const existCompanyData: ICompany | null =
+    const existCompanyData: CompanyDoc | null =
       await this.companyRepository.existCompanyData(companyName);
     if (existCompanyData) {
       throw new HttpError(
@@ -55,10 +56,11 @@ class CompanyServices implements ICompanyService {
       );
     }
 
-    const companyDetails: ICompany =
+    const companyDetails: CompanyDoc | null =
       await this.companyRepository.companyDetails(companyData);
+    if(!companyDetails ) throw new HttpError(HTTP_statusCode.NotFound,"No company Id Exist");
     const companyId = companyDetails._id;
-    const adminData: IAdmin | null =
+    const adminData: AdminDoc | null =
       await this.adminRepository.updateCompanyDetails(companyId, admin_id);
     if (!adminData) {
       throw new HttpError(
@@ -87,9 +89,9 @@ class CompanyServices implements ICompanyService {
     }
     return adminData;
   };
-  companyMembers = async (admin_id: string): Promise<ICompanyMember[]> => {
+  companyMembers = async (admin_id: string): Promise<CompanyMemberDoc[]> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
       if (!adminData) {
@@ -97,14 +99,15 @@ class CompanyServices implements ICompanyService {
       }
 
       const companyId = adminData.companyId;
-      const companyData: ICompany | null =
+      if(!companyId) throw new HttpError(HTTP_statusCode.NotFound,"company Id does not exist")
+      const companyData: CompanyDoc | null =
         await this.companyRepository.companyFindById(companyId);
 
       if (!companyData) {
         throw new HttpError(HTTP_statusCode.NotFound, "Company not found");
       }
 
-      const members: ICompanyMember[] = companyData.members;
+      const members: CompanyMemberDoc[] = companyData.members;
 
       if (!members.length) {
         throw new HttpError(
@@ -125,11 +128,11 @@ class CompanyServices implements ICompanyService {
   searchMembers = async (
     admin_id: string,
     searchQuery: string,
-    selectedProject: IProject | null
-  ): Promise<ICompanyMember[] | IUser[]> => {
+    selectedProject: ProjectDoc | null
+  ): Promise<CompanyMemberDoc[] | UserDoc[]> => {
     try {
       if (selectedProject?._id) {
-        const projectData: IProject | null =
+        const projectData: ProjectDoc | null =
           await this.projectRepository.findProjectById(selectedProject._id);
         if (!projectData) {
           throw new HttpError(
@@ -140,25 +143,25 @@ class CompanyServices implements ICompanyService {
         const memberEmails: string[] = projectData.members.map(
           (member) => member.email
         );
-        const users: IUser[] = await this.userRepository.searchProjectMembers(
+        const users: UserDoc[] = await this.userRepository.searchProjectMembers(
           memberEmails,
           searchQuery
         );
         return users;
       } else {
-        const adminData: IAdmin | null =
+        const adminData: AdminDoc | null =
           await this.adminRepository.findByAdminId(admin_id);
-        if (!adminData) {
+        if (!adminData || !adminData.companyId) {
           throw new HttpError(HTTP_statusCode.NotFound, "Admin data not found");
         }
-
-        const companyData: ICompany | null =
+        
+        const companyData: CompanyDoc | null =
           await this.companyRepository.companyFindById(adminData.companyId);
 
         if (!companyData) {
           throw new HttpError(HTTP_statusCode.NotFound, "Company not found");
         }
-        const matchedMembers: ICompanyMember[] = companyData.members
+        const matchedMembers: CompanyMemberDoc[] = companyData.members
           .filter((member) => new RegExp(searchQuery, "i").test(member.email)) // Filter by email
           .sort(
             (a, b) =>
@@ -173,15 +176,15 @@ class CompanyServices implements ICompanyService {
 
   companyData = async (admin_id: string): Promise<string> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
-      if (!adminData) {
+      if (!adminData?.companyId) {
         throw new HttpError(HTTP_statusCode.NotFound, "Admin data not found");
       }
 
       const companyId = adminData.companyId;
-      const companyData: ICompany | null =
+      const companyData: CompanyDoc | null =
         await this.companyRepository.companyFindById(companyId);
 
       if (!companyData) {
@@ -198,24 +201,24 @@ class CompanyServices implements ICompanyService {
   inviationUsers = async (
     admin_id: string,
     members: IMember[]
-  ): Promise<ICompanyMember[]> => {
+  ): Promise<CompanyMemberDoc[]> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
-      if (!adminData) {
+      if (!adminData?.companyId) {
         throw new HttpError(HTTP_statusCode.NotFound, "Admin data not found");
       }
 
       const companyId: string = adminData.companyId;
-      const companyData: ICompany | null =
-        await this.companyRepository.companyFindById(companyId);
+      const companyData: CompanyDoc | null =
+      await this.companyRepository.companyFindById(companyId);
 
       if (!companyData) {
         throw new HttpError(HTTP_statusCode.NotFound, "Company data not found");
       }
 
-      const updatedCompany: ICompany | null =
+      const updatedCompany: CompanyDoc | null =
         await this.companyRepository.updateCompanyDetails(companyId, members);
 
       if (!updatedCompany) {
@@ -224,7 +227,7 @@ class CompanyServices implements ICompanyService {
           "No company members were modified"
         );
       }
-      const companyMembers: ICompanyMember[] = updatedCompany.members.sort(
+      const companyMembers: CompanyMemberDoc[] = updatedCompany.members.sort(
         (a, b) =>
           new Date(b.invitedAt).getTime() - new Date(a.invitedAt).getTime()
       );
@@ -246,15 +249,15 @@ class CompanyServices implements ICompanyService {
   };
   inviteUser = async (admin_id: string, email: string): Promise<void> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
-      if (!adminData) {
+      if (!adminData?.companyId) {
         throw new HttpError(HTTP_statusCode.NotFound, "No Admin Data found");
       }
 
       const companyId: string = adminData.companyId;
-      const companyData: ICompany | null =
+      const companyData: CompanyDoc | null =
         await this.companyRepository.companyFindById(companyId);
 
       if (!companyData) {
@@ -283,14 +286,14 @@ class CompanyServices implements ICompanyService {
     premium: string;
   }> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
-      if (!adminData) {
+      if (!adminData?.companyId) {
         throw new HttpError(HTTP_statusCode.NotFound, "No Admin Data found");
       }
       const status = "active";
-      const paymentData: IPayment | null =
+      const paymentData: PaymentDoc | null =
         await this.paymentRepository.paymentStatus(admin_id, status);
       let premium: string;
       if (paymentData) {
@@ -302,7 +305,7 @@ class CompanyServices implements ICompanyService {
         premium = "Go Premium";
       }
       const companyId = adminData.companyId;
-      const companyInfo: ICompany | null =
+      const companyInfo: CompanyDoc | null =
         await this.companyRepository.companyFindById(companyId);
       if (!companyInfo) {
         throw new HttpError(HTTP_statusCode.NotFound, "No company exists");
@@ -320,7 +323,7 @@ class CompanyServices implements ICompanyService {
   };
   companyName = async (user_id: string): Promise<string> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!userData) {
@@ -336,7 +339,7 @@ class CompanyServices implements ICompanyService {
 
       const refferalCode = userData.refferalCode;
 
-      const companyDetails: ICompany | null =
+      const companyDetails: CompanyDoc | null =
         await this.companyRepository.companyDetailsByRefferal(refferalCode);
 
       if (!companyDetails) {

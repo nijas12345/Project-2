@@ -1,4 +1,4 @@
-import { IAdmin, IUser } from "../Interfaces/commonInterface";
+import { AdminDoc } from "../Model/adminModal";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import path from "path";
@@ -15,15 +15,15 @@ import { IAdminService } from "../Interfaces/admin.service.interface";
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { HttpError } from "../Utils/HttpError";
-import { HttpStatusCode } from "axios";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import cloudinary from "../Config/cloudinary_config";
+import { UserDoc } from "../Model/userModal";
 
 const client = new OAuth2Client(`${process.env.Google_clientID}`);
 class AdminServices implements IAdminService {
   private adminRepository: IAdminRepository;
   private userRepository: IUserRepository;
-  private adminData: IAdmin | null = null;
+  private adminData: AdminDoc | null = null;
   private otp: string | null = null;
   private expiryOTP_time: Date | null = null;
   constructor(
@@ -37,7 +37,7 @@ class AdminServices implements IAdminService {
     email: string,
     password: string
   ): Promise<{
-    adminData: IAdmin;
+    adminData: AdminDoc;
     adminToken: string;
     adminRefreshToken: string;
   }> => {
@@ -73,9 +73,9 @@ class AdminServices implements IAdminService {
     }
   };
 
-  register = async (adminData: IAdmin): Promise<void> => {
+  register = async (adminData: AdminDoc): Promise<void> => {
     try {
-      const alreadyExists: IAdmin | null =
+      const alreadyExists: AdminDoc | null =
         await this.adminRepository.findByEmail(adminData.email);
       if (alreadyExists) {
         throw new HttpError(HTTP_statusCode.Conflict, "Email already exists");
@@ -101,7 +101,7 @@ class AdminServices implements IAdminService {
       throw error;
     }
   };
-  otpVerification = async (enteredOTP: string): Promise<IAdmin> => {
+  otpVerification = async (enteredOTP: string): Promise<AdminDoc> => {
     try {
       if (!this.adminData) {
         throw new HttpError(HTTP_statusCode.NotFound, "Admin data not found");
@@ -123,7 +123,7 @@ class AdminServices implements IAdminService {
       );
       this.adminData.password = hashedPassword;
       this.adminData!.admin_id = uuidv4();
-      const response: IAdmin = await this.adminRepository.register(
+      const response: AdminDoc = await this.adminRepository.register(
         this.adminData
       );
 
@@ -162,7 +162,7 @@ class AdminServices implements IAdminService {
   verifyGoogleAuth = async (
     token: string
   ): Promise<{
-    adminData: IAdmin;
+    adminData: AdminDoc;
     adminToken: string;
     adminRefreshToken: string;
   }> => {
@@ -182,7 +182,7 @@ class AdminServices implements IAdminService {
         );
       }
 
-      let adminData: IAdmin | null =
+      let adminData: AdminDoc | null =
         await this.adminRepository.verifyGoogleAuth(payload.email);
       if (!adminData) {
         const admin_id = uuidv4();
@@ -206,7 +206,7 @@ class AdminServices implements IAdminService {
   };
   resetPassword = async (email: string): Promise<void> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.resetPassword(
+      const adminData: AdminDoc | null = await this.adminRepository.resetPassword(
         email
       );
       console.log("adminData", adminData);
@@ -264,7 +264,7 @@ class AdminServices implements IAdminService {
       throw error;
     }
   };
-  userBlock = async (user_id: string): Promise<IUser> => {
+  userBlock = async (user_id: string): Promise<UserDoc> => {
     try {
       const userData = await this.userRepository.userBlock(user_id);
       if (!userData) {
@@ -278,7 +278,7 @@ class AdminServices implements IAdminService {
       throw error;
     }
   };
-  userUnBlock = async (user_id: string): Promise<IUser> => {
+  userUnBlock = async (user_id: string): Promise<UserDoc> => {
     try {
       const userData = await this.userRepository.userUnBlock(user_id);
       if (!userData) {
@@ -294,8 +294,8 @@ class AdminServices implements IAdminService {
   };
   updateAdmin = async (
     admin_id: string,
-    admin: IAdmin
-  ): Promise<IAdmin | null> => {
+    admin: AdminDoc
+  ): Promise<AdminDoc | null> => {
     try {
       return await this.adminRepository.updateAdmin(admin_id, admin);
     } catch (error: unknown) {

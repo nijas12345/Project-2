@@ -34,7 +34,7 @@ export interface IAdmin{
     companyId:string
     
 }
-export interface IPayment {
+export interface    IPayment {
     admin_id: string;
     subscription: string; 
     amount: number;     

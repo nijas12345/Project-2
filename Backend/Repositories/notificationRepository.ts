@@ -1,23 +1,23 @@
 import { Model } from "mongoose";
 import { INotificationRepository } from "../Interfaces/notification.repository.interface";
-import { INotification } from "../Interfaces/commonInterface";
-class NotificationRepository implements INotificationRepository {
-  private notificationModel = Model<INotification>;
-  constructor(notificationModel: Model<INotification>) {
+import BaseRepository from "./base/baseRepository";
+import { NotificationDoc, NotificationInput } from "../Model/notificationModal";
+class NotificationRepository extends BaseRepository<NotificationDoc> implements INotificationRepository {
+  private notificationModel = Model<NotificationDoc>;
+  constructor(notificationModel: Model<NotificationDoc>) {
+    super(notificationModel)
     this.notificationModel = notificationModel;
   }
   saveNotification = async (
-    notificationDetails: INotification
-  ): Promise<INotification> => {
+    notificationDetails: NotificationInput
+  ): Promise<NotificationDoc> => {
     try {
-      const notificationData: INotification =
-        await this.notificationModel.create(notificationDetails);
-      return notificationData;
+      return await this.createData(notificationDetails);
     } catch (error: unknown) {
       throw error;
     }
   };
-  getNotifications = async (user_id: string): Promise<INotification[]> => {
+  getNotifications = async (user_id: string): Promise<NotificationDoc[]> => {
     try {
       await this.notificationModel.updateMany(
         { assignedUserId: user_id },
@@ -26,19 +26,18 @@ class NotificationRepository implements INotificationRepository {
         },
         { new: true }
       );
-      const notification: INotification[] = await this.notificationModel
+      return await this.notificationModel
         .find({ assignedUserId: user_id, notificationType: "User" })
         .sort({ createdAt: -1 });
-      return notification;
     } catch (error: unknown) {
       throw error;
     }
   };
   getAdminNotifications = async (
     admin_id: string
-  ): Promise<INotification[]> => {
+  ): Promise<NotificationDoc[]> => {
     try {
-      const notificationData = await this.notificationModel.updateMany(
+      await this.notificationModel.updateMany(
         { admin_id: admin_id, notificationType: "Admin" },
         {
           $set: { isRead: true },
@@ -46,32 +45,29 @@ class NotificationRepository implements INotificationRepository {
         { new: true }
       );
 
-      const notification: INotification[] = await this.notificationModel
+      return await this.notificationModel
         .find({ admin_id: admin_id, notificationType: "Admin" })
         .sort({ createdAt: -1 });
-      return notification;
     } catch (error: unknown) {
       throw error;
     }
   };
-  getNotificationsCount = async (user_id: string): Promise<INotification[]> => {
+  getNotificationsCount = async (user_id: string): Promise<NotificationDoc[]> => {
     try {
-      const notification: INotification[] = await this.notificationModel
+      return await this.notificationModel
         .find({ assignedUserId: user_id, notificationType: "User" })
         .sort({ createdAt: -1 });
-      return notification;
     } catch (error: unknown) {
       throw error;
     }
   };
   adminNotificationsCount = async (
     admin_id: string
-  ): Promise<INotification[]> => {
+  ): Promise<NotificationDoc[]> => {
     try {
-      const notification: INotification[] = await this.notificationModel
+      return await this.notificationModel
         .find({ admin_id: admin_id, notificationType: "Admin" })
         .sort({ createdAt: -1 });
-      return notification;
     } catch (error: unknown) {
       throw error;
     }

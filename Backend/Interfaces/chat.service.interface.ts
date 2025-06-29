@@ -1,7 +1,7 @@
-import { IMeeting, IMessage, IProject} from "./commonInterface"                                   
+import { MessageDoc, MessageInput } from "../Model/chatModal"                                   
 export interface IChatService {
-    getChats(projectId:string,pageNumber:number,limitNumber:number):Promise<IMessage[]>
-    getAdminChats(projectId:string,pageNumber:number,limitNumber:number):Promise<IMessage[]>
-    saveChats(messageDetails:IMessage):Promise<IMessage>
-    saveFiles(messageDetails:IMessage):Promise<IMessage>   
+    getChats(projectId:string,pageNumber:number,limitNumber:number):Promise<MessageDoc[]>
+    getAdminChats(projectId:string,pageNumber:number,limitNumber:number):Promise<MessageDoc[]>
+    saveChats(messageDetails:MessageInput):Promise<MessageDoc>
+    saveFiles(messageDetails:MessageInput):Promise<MessageDoc>   
 }

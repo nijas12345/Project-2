@@ -1,57 +1,56 @@
 import { Model, Types } from "mongoose";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
-import {IUser } from "../Interfaces/commonInterface";
+import { UserDoc } from "../Model/userModal";
+import BaseRepository from "./base/baseRepository";
 
-class UserRepository implements IUserRepository {
-  private userModel = Model<IUser>;
-  constructor(userModel: Model<IUser>) {
+class UserRepository extends BaseRepository<UserDoc> implements IUserRepository {
+  private userModel = Model<UserDoc>;
+  constructor(userModel: Model<UserDoc>) {
+    super(userModel);
     this.userModel = userModel;
   }
-  findByEmail = async (email: string): Promise<IUser | null> => {
+  findByEmail = async (email: string): Promise<UserDoc | null> => {
     try {
-      return await this.userModel.findOne({ email });
+      return await this.findOne({ email });
     } catch (error:unknown) {
       throw error;
     }
   };
-  findByUserId = async (user_id: string): Promise<IUser | null> => {
+  findByUserId = async (user_id: string): Promise<UserDoc | null> => {
     try {
-      const userData: IUser | null = await this.userModel.findOne({
-        user_id: user_id,
+      return await this.findOne({
+        user_id
       });
-      return userData
     } catch (error:unknown) {
       throw error
     }
   }
-  register = async (userData: IUser): Promise<IUser> => {
+  register = async (userData: UserDoc): Promise<UserDoc> => {
     try {
-      return await this.userModel.create(userData);
+      return await this.createData(userData);
     } catch (error:unknown) {
       throw error;
     }
   };
-  login = async (email: string): Promise<IUser | null> => {
+  login = async (email: string): Promise<UserDoc | null> => {
     try {
-     const userWithoutId: IUser | null = await this.userModel.findOne(
+     return await this.userModel.findOne(
         { email: email },
         { _id: 0 }
       );
-      return userWithoutId;
     } catch (error:unknown) {
       throw error;
     }
   };
-  verifyGoogleAuth = async (email: string): Promise<IUser | null> => {
+  verifyGoogleAuth = async (email: string): Promise<UserDoc | null> => {
     try {
-     const userData:IUser|null =  await this.userModel.findOne({ email: email }, { _id: 0 })
-     return userData
+     return await this.findOne({ email }, { _id: 0 })
     } catch (error:unknown) {
       console.log(error);
       return null;
     }
   };
-  createUser = async (email: string, user_id: string): Promise<IUser> => {
+  createUser = async (email: string, user_id: string): Promise<UserDoc> => {
     try {
       const userData = {
         firstName: email.split("@")[0],
@@ -65,9 +64,9 @@ class UserRepository implements IUserRepository {
       throw error
     }
   }
-  resetPassword = async (email: string): Promise<IUser | null> => {
+  resetPassword = async (email: string): Promise<UserDoc | null> => {
     try {
-      return await this.userModel.findOne({ email: email });
+      return await this.findOne({ email });
     } catch (error:unknown) {
       throw error;
     }
@@ -77,7 +76,7 @@ class UserRepository implements IUserRepository {
     password: string
   ): Promise<void> => {
     try {
-      await this.userModel.findOneAndUpdate(
+      await this.findOneAndUpdate(
         { email: email },
         {
           password: password,
@@ -87,9 +86,9 @@ class UserRepository implements IUserRepository {
       throw error;
     }
   };
-  updateUser = async (user_id: string, user: IUser): Promise<IUser | null> => {
+  updateUser = async (user_id: string, user: UserDoc): Promise<UserDoc | null> => {
     try {
-      const updatedUser: IUser | null = await this.userModel.findOneAndUpdate(
+      return await this.findOneAndUpdate(
       { user_id: user_id },
       {
         firstName: user.firstName,
@@ -97,40 +96,36 @@ class UserRepository implements IUserRepository {
         phone: user.phone,
         address: user.address,
         position: user.position,
-        companyName: user.city,
+        city: user.city,
         state: user.state,
       },
-      { new: true } // ✅ this returns the updated document
     );
-    return updatedUser;
     } catch(error:unknown) {
       throw error;
     }
   };
-  userBlock = async (user_id: string): Promise<IUser | null> => {
+  userBlock = async (user_id: string): Promise<UserDoc | null> => {
       try {
-        const userData: IUser | null = await this.userModel.findOneAndUpdate(
+        return await this.findOneAndUpdate(
           { user_id: user_id },
           {
             isBlocked: true,
           },
           { new: true }
         );
-        return userData;
       } catch(error:unknown) {
         throw error;
       }
     };
-    userUnBlock = async (user_id: string): Promise<IUser | null> => {
+    userUnBlock = async (user_id: string): Promise<UserDoc | null> => {
       try {
-        const userData: IUser | null = await this.userModel.findOneAndUpdate(
+        return await this.userModel.findOneAndUpdate(
           { user_id: user_id },
           {
             isBlocked: false,
           },
           { new: true }
         );
-        return userData;
       } catch(error:unknown) {
         throw error;
       }
@@ -138,14 +133,13 @@ class UserRepository implements IUserRepository {
   profilePicture = async (
     user_id: string,
     profileURL: string
-  ): Promise<IUser|null> => {
+  ): Promise<UserDoc|null> => {
     try {
-      const userData: IUser | null = await this.userModel.findOneAndUpdate(
-        { user_id: user_id },
+      return await this.findOneAndUpdate(
+        { user_id},
         { profileImage: profileURL },
         { new: true }
       );
-      return userData
     } catch(error:unknown) {
       throw error;
     }
@@ -154,28 +148,27 @@ class UserRepository implements IUserRepository {
     user_id: string,
     refferalCode: string,
     companyId:Types.ObjectId
-  ): Promise<IUser | null> => {
+  ): Promise<UserDoc | null> => {
     try {
-      const userData: IUser | null = await this.userModel.findOneAndUpdate(
-        { user_id: user_id },
+      const userData: UserDoc | null = await this.findOneAndUpdate(
+        { user_id},
         {
-          refferalCode: refferalCode,
-          companyId: companyId,
+          refferalCode,
+          companyId
         },
-        { new: true }
       );
       return userData;
     } catch(error:unknown) {
       throw error;
     }
   };
-  userWithoutId = async(user_id: string): Promise<IUser | null> => {
+  userWithoutId = async(user_id: string): Promise<UserDoc | null> => {
     try {    
-      const userWithoutId = await this.userModel.findOne(
+       return await this.findOne(
         { user_id:user_id },
         { _id: 0, companyId: 0 } // Exclude _id and companyId
       );
-      return userWithoutId;
+
     } catch (error:unknown) {
       throw error
     }
@@ -183,13 +176,13 @@ class UserRepository implements IUserRepository {
     searchProjectMembers = async (
       memberEmails:string[],
       searchQuery:string
-    ): Promise<IUser[]> => {
+    ): Promise<UserDoc[]> => {
       try {
         const searchRegex = new RegExp(searchQuery, "i");
-        const users: IUser[] = await this.userModel.find({
+        return await this.findAll({
           email: { $in: memberEmails, $regex: searchRegex },
         });
-        return users;
+        
       } catch(error:unknown) {
         throw error;
       }
@@ -204,31 +197,28 @@ class UserRepository implements IUserRepository {
         throw error
       }
     }
-    existingUsers = async(refferalCode: string, memberEmails: string[]): Promise<IUser[]> => {
+    existingUsers = async(refferalCode: string, memberEmails: string[]): Promise<UserDoc[]> => {
       try {
-        const existingUsers:IUser[] = await this.userModel.find({
+        return await this.findAll({
             email: { $in: memberEmails }, 
-            refferalCode: refferalCode, 
+            refferalCode 
         });
-        return existingUsers
       } catch (error:unknown) {
         throw error
       }
     }
-    findUsers = async (memberEmails: string[]): Promise<IUser[]>  => {
+    findUsers = async (memberEmails: string[]): Promise<UserDoc[]>  => {
       try {
-      const users = await this.userModel.find({ email: { $in: memberEmails } });
-      return users;
+      return await this.findAll({ email: { $in: memberEmails } });
       } catch (error) {
         throw error
       }
     }
-     userIsBlocked = async (user_id: string): Promise<IUser|null> => {
+     userIsBlocked = async (user_id: string): Promise<UserDoc|null> => {
     try {
-      const userData: IUser|null = await this.userModel.findOne({
-        user_id: user_id,
+      return await this.findOne({
+        user_id
       });
-      return userData;
     } catch (error) {
       throw error;
     }

@@ -1,10 +1,6 @@
 import { INotificationRepository } from "../Interfaces/notification.repository.interface";
-import {
-  IAdmin,
-  INotification,
-  ITask,
-  IUser,
-} from "../Interfaces/commonInterface";
+import { UserDoc } from "../Model/userModal";
+import { TaskDoc } from "../Model/taskModal";
 import { INotificationService } from "../Interfaces/notification.service.interface";
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
 import { ITaskRepository } from "../Interfaces/task.repository.interface";
@@ -12,6 +8,8 @@ import { Types } from "mongoose";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import { AdminDoc } from "../Model/adminModal";
+import { NotificationDoc, NotificationInput } from "../Model/notificationModal";
 
 class NotificationService implements INotificationService {
   private notificationRepository: INotificationRepository;
@@ -30,13 +28,13 @@ class NotificationService implements INotificationService {
     this.taskRepository = taskRepository;
   }
   saveNotification = async (
-    notificationDetails: INotification
+    notificationDetails: NotificationInput
   ): Promise<{ message: string; assignedUserId: string }> => {
     try {
       console.log(typeof notificationDetails.taskId);
       
       const admin_id: string = notificationDetails.admin_id;
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
       if (!adminData) {
@@ -53,22 +51,22 @@ class NotificationService implements INotificationService {
         );
       }
       const taskId = notificationDetails.taskId;
-      const taskData: ITask | null = await this.taskRepository.taskFindById(
+      const taskData: TaskDoc | null = await this.taskRepository.taskFindById(
         new Types.ObjectId(taskId)
       );  
-      if (!taskData) {
+      if (!taskData || !taskData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No task data found");
       }
       const taskMember = taskData.member;
       const taskMessage = taskData.taskName;
-      const assignedUserData: IUser | null =
+      const assignedUserData: UserDoc | null =
         await this.userRepository.findByEmail(taskMember);
       if (!assignedUserData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No assigned members");
       }
       const assignedUserId = assignedUserData.user_id;
       const message = `A new task ${taskMessage} assigned by ${adminEmail}`;
-      const notification: INotification = {
+      const notification: NotificationInput = {
         admin_id: adminID,
         taskId: taskId,
         message: message,
@@ -83,11 +81,11 @@ class NotificationService implements INotificationService {
     }
   };
   userSaveNotification = async (
-    notificationDetails: INotification
+    notificationDetails: NotificationInput
   ): Promise<{ message: string; admin_id: string }> => {
     try {
       const user_id: string = notificationDetails.assignedUserId;
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!userData) {
@@ -96,7 +94,7 @@ class NotificationService implements INotificationService {
       const assignedUserId = userData.user_id;
       const userEmail = userData.email;
       const taskId = notificationDetails.taskId;
-      const taskData: ITask | null = await this.taskRepository.taskFindById(
+      const taskData: TaskDoc | null = await this.taskRepository.taskFindById(
         taskId
       );
 
@@ -105,7 +103,7 @@ class NotificationService implements INotificationService {
       }
       const admin_id: string = taskData.admin_id;
       const message = notificationDetails.message;
-      const notification: INotification = {
+      const notification: NotificationInput = {
         admin_id: admin_id,
         taskId: taskId,
         message: message,
@@ -119,9 +117,9 @@ class NotificationService implements INotificationService {
       throw error;
     }
   };
-  getNotifications = async (user_id: string): Promise<INotification[]> => {
+  getNotifications = async (user_id: string): Promise<NotificationDoc[]> => {
     try {
-      const notificationData: INotification[] =
+      const notificationData: NotificationDoc[] =
         await this.notificationRepository.getNotifications(user_id);
       if (!notificationData) {
         throw new HttpError(
@@ -136,9 +134,9 @@ class NotificationService implements INotificationService {
   };
   getAdminNotifications = async (
     admin_id: string
-  ): Promise<INotification[]> => {
+  ): Promise<NotificationDoc[]> => {
     try {
-      const notificationData: INotification[] =
+      const notificationData: NotificationDoc[] =
         await this.notificationRepository.getAdminNotifications(admin_id);
       if (!notificationData) {
         throw new HttpError(
@@ -151,9 +149,9 @@ class NotificationService implements INotificationService {
       throw error;
     }
   };
-  getNotificationsCount = async (user_id: string): Promise<INotification[]> => {
+  getNotificationsCount = async (user_id: string): Promise<NotificationDoc[]> => {
     try {
-      const notificationData: INotification[] =
+      const notificationData: NotificationDoc[] =
         await this.notificationRepository.getNotificationsCount(user_id);
       if (!notificationData) {
         throw new HttpError(
@@ -168,9 +166,9 @@ class NotificationService implements INotificationService {
   };
   adminNotificationsCount = async (
     admin_id: string
-  ): Promise<INotification[]> => {
+  ): Promise<NotificationDoc[]> => {
     try {
-      const notificationData: INotification[] =
+      const notificationData: NotificationDoc[] =
         await this.notificationRepository.adminNotificationsCount(admin_id);
       if (!notificationData) {
         throw new HttpError(

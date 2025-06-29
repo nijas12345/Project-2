@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import { IComments, ITask } from "../Interfaces/commonInterface";
+import { IComments } from "../Interfaces/commonInterface";
 import { ITaskService } from "../Interfaces/task.service.interface";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import cloudinary from "../Config/cloudinary_config";
 import { HttpStatusCode } from "axios";
 import fs from "fs/promises";
 import { handleError } from "../Utils/handleError";
+import { TaskDoc, TaskInput } from "../Model/taskModal";
 
 class TaskController {
   private taskService: ITaskService;
@@ -17,7 +18,7 @@ class TaskController {
       const admin_id = req.admin_id as string;
       const file = req.file;
       if (!file) {
-        const tasks: ITask = {
+        const tasks: TaskInput = {
           admin_id: admin_id,
           taskName: req.body.taskName,
           description: req.body.description,
@@ -40,7 +41,7 @@ class TaskController {
             }
           }
         );
-        const tasks: ITask = {
+        const tasks: TaskInput = {
           admin_id: admin_id,
           taskName: req.body.taskName,
           description: req.body.description,
@@ -68,7 +69,7 @@ class TaskController {
       const admin_id = req.admin_id as string;
       const file = req.file;
       if (!file) {
-        const tasks: ITask = {
+        const tasks: TaskDoc = {
           admin_id: admin_id,
           _id: req.body.id,
           taskName: req.body.taskName,
@@ -98,7 +99,7 @@ class TaskController {
         } catch (deleteError) {
           console.error("Error deleting local file:", deleteError);
         }
-        const tasks: ITask = {
+        const tasks: TaskDoc = {
           admin_id: admin_id,
           _id: req.body.id,
           taskName: req.body.taskName,

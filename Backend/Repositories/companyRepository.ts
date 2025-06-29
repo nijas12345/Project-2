@@ -1,44 +1,43 @@
 import { Model } from "mongoose";
 import {
-  ICompany,
   IMember,
 } from "../Interfaces/commonInterface";
 import { ICompanyRepository } from "../Interfaces/company.repository.interface";
+import { CompanyDoc } from "../Model/companyModal";
+import BaseRepository from "./base/baseRepository";
 
-class CompanyRepository implements ICompanyRepository {
+class CompanyRepository extends BaseRepository<CompanyDoc> implements ICompanyRepository {
 
-  private companyModel = Model<ICompany>;
+  private companyModel = Model<CompanyDoc>;
   constructor(
-    companyModel: Model<ICompany>,
+    companyModel: Model<CompanyDoc>,
   ) {
+    super(companyModel)
     this.companyModel = companyModel;
   }
-  existCompanyData = async (companyName: string): Promise<ICompany | null> => {
+  existCompanyData = async (companyName: string): Promise<CompanyDoc | null> => {
     try {
-      const existCompanyData: ICompany | null = await this.companyModel.findOne(
-        { companyName: companyName }
+      return await this.findOne(
+        { companyName }
       );
-      return existCompanyData;
     } catch (error: unknown) {
       throw error;
     }
   };
-  companyDetails = async (companyData: ICompany): Promise<ICompany> => {
+  companyDetails = async (companyData: CompanyDoc): Promise<CompanyDoc> => {
     try {
-      const companyDetails: ICompany = await this.companyModel.create(
+      return await this.createData(
         companyData
       );
-      return companyDetails;
     } catch (error: unknown) {
       throw error;
     }
   };
-  companyFindById = async (companyId: string): Promise<ICompany | null> => {
+  companyFindById = async (companyId: string): Promise<CompanyDoc | null> => {
     try {
-      const companyData: ICompany | null = await this.companyModel.findOne({
+      return await this.findOne({
         _id: companyId,
       });
-      return companyData;
     } catch (error: unknown) {
       throw error;
     }
@@ -47,9 +46,9 @@ class CompanyRepository implements ICompanyRepository {
   updateCompanyDetails = async (
     companyId: string,
     members: IMember[]
-  ): Promise<ICompany | null> => {
+  ): Promise<CompanyDoc | null> => {
     try {
-      const updatedCompany: ICompany | null =
+      const updatedCompany: CompanyDoc | null =
         await this.companyModel.findOneAndUpdate(
           { _id: companyId },
           { $addToSet: { members: { $each: members } } },
@@ -63,12 +62,11 @@ class CompanyRepository implements ICompanyRepository {
 
   companyDetailsByRefferal = async (
     refferalCode: string
-  ): Promise<ICompany | null> => {
+  ): Promise<CompanyDoc | null> => {
     try {
-      const companyDetails: ICompany | null = await this.companyModel.findOne({
-        refferalCode: refferalCode,
+      return await this.findOne({
+        refferalCode
       });
-      return companyDetails;
     } catch (error: unknown) {
       throw error;
     }
@@ -76,10 +74,10 @@ class CompanyRepository implements ICompanyRepository {
   updateCompanyRefferal = async (
     refferalCode: string,
     email: string
-  ): Promise<ICompany | null> => {
+  ): Promise<CompanyDoc | null> => {
     try {
-      const companyData: ICompany | null =
-        await this.companyModel.findOneAndUpdate(
+    
+      return  await this.findOneAndUpdate(
           {
             refferalCode: refferalCode, // Match the referral code
             "members.email": email, // Match the email within the members array
@@ -89,15 +87,14 @@ class CompanyRepository implements ICompanyRepository {
           },
           { new: true } // Return the updated document
         );
-      return companyData;
     } catch (error: unknown) {
       throw error;
     }
   };
-  updateJoinedStatus = async (email: string): Promise<ICompany | null> => {
+  updateJoinedStatus = async (email: string): Promise<CompanyDoc | null> => {
     try {
-      const companyData: ICompany | null =
-        await this.companyModel.findOneAndUpdate(
+      
+      return await this.findOneAndUpdate(
           {
             "members.email": email,
           },
@@ -106,7 +103,6 @@ class CompanyRepository implements ICompanyRepository {
           },
           { new: true }
         );
-      return companyData;
     } catch (error: unknown) {
       throw error;
     }

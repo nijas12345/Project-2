@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { IAdminService } from "../Interfaces/admin.service.interface";
 import HTTP_statusCode from "../Enums/httpStatusCode";
-import { IAdmin } from "../Interfaces/commonInterface";
+import { AdminDoc } from "../Model/adminModal";
 import dotenv from "dotenv";
 dotenv.config();
 import { HttpError } from "../Utils/HttpError";
@@ -158,7 +158,7 @@ class AdminController {
   };
   unBlockUser = async (req: Request, res: Response) => {
     try {
-      const { user_id } = req.body;
+      const { user_id } = req.body ;
       const serviceResponse = await this.adminService.userUnBlock(user_id);
       res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
@@ -168,7 +168,7 @@ class AdminController {
   updateAdmin = async (req: Request, res: Response) => {
     try {
       const admin_id: string = req.admin_id as string;
-      const admin: IAdmin = req.body;
+      const admin: AdminDoc = req.body;
       const serviceResponse = await this.adminService.updateAdmin(
         admin_id,
         admin

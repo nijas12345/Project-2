@@ -1,46 +1,47 @@
 import { Model } from "mongoose";
-import { IAdmin } from "../Interfaces/commonInterface";
+import { AdminDoc } from "../Model/adminModal";
 import { Types } from "mongoose";
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
+import BaseRepository from "./base/baseRepository";
 
-class AdminRepository implements IAdminRepository {
-  private adminModel = Model<IAdmin>;
-  constructor(adminModel: Model<IAdmin>) {
+class AdminRepository extends BaseRepository<AdminDoc> implements IAdminRepository {
+  private adminModel = Model<AdminDoc>;
+  constructor(adminModel: Model<AdminDoc>) {
+    super(adminModel)
     this.adminModel = adminModel;
   }
-  findByEmail = async (email: string): Promise<IAdmin | null> => {
+  findByEmail = async (email: string): Promise<AdminDoc | null> => {
     try {
-      return await this.adminModel.findOne({ email });
+      return await this.findOne({ email });
     } catch (error: unknown) {
       throw error;
     }
   };
-  register = async (adminData: IAdmin): Promise<IAdmin> => {
+  register = async (adminData: AdminDoc): Promise<AdminDoc> => {
     try {
-      return await this.adminModel.create(adminData);
+      return await this.createData(adminData);
     } catch (error: unknown) {
       throw error;
     }
   };
-  login = async (email: string): Promise<IAdmin | null> => {
+  login = async (email: string): Promise<AdminDoc | null> => {
     try {
-      const admin: IAdmin | null = await this.adminModel.findOne(
+       return await this.findOne(
         { email },
-        { _id: 0 }
+        { _id: 0 } 
       );
-      return admin;
     } catch (error: unknown) {
       throw error;
     }
   };
-  verifyGoogleAuth = async (email: string): Promise<IAdmin | null> => {
+  verifyGoogleAuth = async (email: string): Promise<AdminDoc | null> => {
     try {
-      return await this.adminModel.findOne({ email: email }, { _id: 0 });
+      return await this.findOne({ email }, { _id: 0 });
     } catch (error: unknown) {
       throw error;
     }
   };
-  createAdmin = async (email: string, admin_id: string): Promise<IAdmin> => {
+  createAdmin = async (email: string, admin_id: string): Promise<AdminDoc> => {
     try {
       const adminData = {
         firstName: email.split("@")[0],
@@ -54,9 +55,9 @@ class AdminRepository implements IAdminRepository {
       throw error;
     }
   };
-  resetPassword = async (email: string): Promise<IAdmin | null> => {
+  resetPassword = async (email: string): Promise<AdminDoc | null> => {
     try {
-      return await this.adminModel.findOne({ email: email });
+      return await this.findOne({ email });
     } catch (error: unknown) {
       throw error;
     }
@@ -66,20 +67,18 @@ class AdminRepository implements IAdminRepository {
     password: string
   ): Promise<void> => {
     try {
-      await this.adminModel.findOneAndUpdate(
-        { email: email },
-        {
-          password: password,
-        }
-      );
+      await this.findOneAndUpdate(
+      { email },
+      { $set: { password: password } }
+    );
     } catch (error: unknown) {
       throw error;
     }
   };
 
-  findByAdminId = async (admin_id: string): Promise<IAdmin | null> => {
+  findByAdminId = async (admin_id: string): Promise<AdminDoc | null> => {
     try {
-      return await this.adminModel.findOne({ admin_id });
+      return await this.findOne({ admin_id });
     } catch (error: unknown) {
       throw error;
     }
@@ -88,12 +87,11 @@ class AdminRepository implements IAdminRepository {
   updateProfileImage = async (
     admin_id: string,
     profileURL: string
-  ): Promise<IAdmin | null> => {
+  ): Promise<AdminDoc | null> => {
     try {
-      return await this.adminModel.findOneAndUpdate(
+      return await this.findOneAndUpdate(
         { admin_id },
-        { profileImage: profileURL },
-        { new: true }
+  { $set: { profileImage: profileURL } },
       );
     } catch (error: unknown) {
       throw error;
@@ -102,11 +100,10 @@ class AdminRepository implements IAdminRepository {
 
   updateAdmin = async (
     admin_id: string,
-    admin: IAdmin
-  ): Promise<IAdmin | null> => {
+    admin: AdminDoc
+  ): Promise<AdminDoc | null> => {
     try {
-      const updatedAdmin: IAdmin | null =
-        await this.adminModel.findOneAndUpdate(
+      return await this.findOneAndUpdate(
           { admin_id },
           {
             firstName: admin.firstName,
@@ -117,10 +114,7 @@ class AdminRepository implements IAdminRepository {
             city: admin.city,
             state: admin.state,
           },
-          { new: true }
         );
-
-      return updatedAdmin;
     } catch (error: unknown) {
       throw error;
     }
@@ -128,16 +122,14 @@ class AdminRepository implements IAdminRepository {
   updateCompanyDetails = async (
     companyId: Types.ObjectId,
     admin_id: string
-  ): Promise<IAdmin | null> => {
+  ): Promise<AdminDoc | null> => {
     try {
-      const adminData: IAdmin | null = await this.adminModel.findOneAndUpdate(
-        { admin_id: admin_id },
+      return await this.findOneAndUpdate(
+        { admin_id },
         {
-          companyId: companyId,
+          companyId
         },
-        { new: true }
       );
-      return adminData;
     } catch (error: unknown) {
       throw error;
     }

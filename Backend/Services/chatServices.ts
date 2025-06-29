@@ -1,6 +1,6 @@
 import { IChatRepository } from "../Interfaces/chat.repository.interface";
 import { IChatService } from "../Interfaces/chat.service.interface";
-import { IMessage } from "../Interfaces/commonInterface";
+import { MessageDoc, MessageInput } from "../Model/chatModal"; 
 
 class ChatServices implements IChatService {
   private chatRepository: IChatRepository;
@@ -11,9 +11,9 @@ class ChatServices implements IChatService {
     projectId: string,
     pageNumber: number,
     limitNumber: number
-  ): Promise<IMessage[]> => {
+  ): Promise<MessageDoc[]> => {
     try {
-      const chats: IMessage[] = await this.chatRepository.getChats(
+      const chats: MessageDoc[] = await this.chatRepository.getChats(
         projectId,
         pageNumber,
         limitNumber
@@ -27,9 +27,9 @@ class ChatServices implements IChatService {
     projectId: string,
     pageNumber: number,
     limitNumber: number
-  ): Promise<IMessage[]> => {
+  ): Promise<MessageDoc[]> => {
     try {
-      const chats: IMessage[] = await this.chatRepository.getChats(
+      const chats: MessageDoc[] = await this.chatRepository.getChats(
         projectId,
         pageNumber,
         limitNumber
@@ -40,9 +40,9 @@ class ChatServices implements IChatService {
     }
   };
 
-  saveChats = async (messageDetails: IMessage): Promise<IMessage> => {
+  saveChats = async (messageDetails: MessageInput): Promise<MessageDoc> => {
     try {
-      const chats: IMessage = await this.chatRepository.saveChats(
+      const chats: MessageDoc = await this.chatRepository.saveChats(
         messageDetails
       );
       return chats;
@@ -50,9 +50,9 @@ class ChatServices implements IChatService {
       throw error;
     }
   };
-  saveFiles = async (messageWithFile: IMessage): Promise<IMessage> => {
+  saveFiles = async (messageWithFile: MessageInput): Promise<MessageDoc> => {
     try {
-      const chats: IMessage = await this.chatRepository.saveFiles(
+      const chats: MessageDoc = await this.chatRepository.saveFiles(
         messageWithFile
       );
       return chats;

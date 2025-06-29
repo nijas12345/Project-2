@@ -1,11 +1,7 @@
-import { log } from "node:console";
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
 import {
-  IAdmin,
   IMeeting,
   IMember,
-  IProject,
-  IUser,
 } from "../Interfaces/commonInterface";
 import { IMeetingRepository } from "../Interfaces/meeting.repository.interface";
 import { IMeetingService } from "../Interfaces/meeting.service.interface";
@@ -13,6 +9,11 @@ import { IProjectRepository } from "../Interfaces/project.repository.interface";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import { UserDoc } from "../Model/userModal";
+import { MemberDoc, MemberInput, ProjectDoc } from "../Model/projectModal";
+import { AdminDoc } from "../Model/adminModal";
+import { MeetingDoc } from "../Model/meetingModal";
+import mongoose from "mongoose";
 
 class MeetingServices implements IMeetingService {
   private meetingRepository: IMeetingRepository;
@@ -30,16 +31,16 @@ class MeetingServices implements IMeetingService {
     this.userRepository = userRepository;
     this.projectRepository = projectRepository;
   }
-  getMeetings = async (user_id: string): Promise<IProject[]> => {
+  getMeetings = async (user_id: string): Promise<ProjectDoc[]> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!userData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No user data found");
       }
       const email: string = userData.email;
-      const projectData: IProject[] = await this.projectRepository.getMeetings(
+      const projectData: ProjectDoc[] = await this.projectRepository.getMeetings(
         email
       );
       return projectData;
@@ -47,9 +48,9 @@ class MeetingServices implements IMeetingService {
       throw error;
     }
   };
-  getAdminMeetings = async (admin_id: string): Promise<IProject[]> => {
+  getAdminMeetings = async (admin_id: string): Promise<ProjectDoc[]> => {
     try {
-      const projectData: IProject[] =
+      const projectData: ProjectDoc[] =
         await this.projectRepository.getAdminMeetings(admin_id);
       return projectData;
     } catch (error: unknown) {
@@ -61,9 +62,9 @@ class MeetingServices implements IMeetingService {
     meetingTime: Date,
     projectId: string,
     roomId: string
-  ): Promise<IMeeting> => {
+  ): Promise<MeetingDoc> => {
     try {
-      const projectData: IProject | null =
+      const projectData: ProjectDoc | null =
         await this.projectRepository.findProjectById(projectId);
       if (!projectData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No project data found");
@@ -72,18 +73,18 @@ class MeetingServices implements IMeetingService {
         email: member.email,
         role: "Member",
       }));
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
         admin_id
       );
       if (!adminData) throw new Error("No Admin Data");
-      const meetingData: IMeeting = {
+      const meetingData:IMeeting = {
         admin_id: admin_id,
         projectId: projectId,
         MeetingTime: meetingTime,
         roomId: roomId,
         members: members,
       };
-      const meeting: IMeeting | null =
+      const meeting: MeetingDoc | null =
         await this.meetingRepository.scheduleMeetings(meetingData);
       if (!meeting) throw new Error("No meeting created");
       return meeting;
@@ -94,9 +95,9 @@ class MeetingServices implements IMeetingService {
   fetchMeetings = async (
     user_id: string,
     projectId: string
-  ): Promise<IMeeting[]> => {
+  ): Promise<MeetingDoc[]> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
 
@@ -104,7 +105,7 @@ class MeetingServices implements IMeetingService {
         throw new HttpError(HTTP_statusCode.NotFound, "No user data found");
       }
       const userEmail: string = userData.email;
-      const meetingData: IMeeting[] =
+      const meetingData: MeetingDoc[] =
         await this.meetingRepository.fetchMeetings(userEmail, projectId);
       return meetingData;
     } catch (error: unknown) {
@@ -114,9 +115,9 @@ class MeetingServices implements IMeetingService {
   AdminfetchMeetings = async (
     admin_id: string,
     projectId: string
-  ): Promise<IMeeting[]> => {
+  ): Promise<MeetingDoc[]> => {
     try {
-      const meetingData: IMeeting[] =
+      const meetingData: MeetingDoc[] =
         await this.meetingRepository.AdminfetchMeetings(admin_id, projectId);
       return meetingData;
     } catch (error: unknown) {
@@ -126,9 +127,9 @@ class MeetingServices implements IMeetingService {
   updateMeetingStatus = async (
     meetingId: string,
     status: string
-  ): Promise<IMeeting> => {
+  ): Promise<MeetingDoc> => {
     try {
-      const meetingData: IMeeting | null =
+      const meetingData: MeetingDoc | null =
         await this.meetingRepository.updateMeetingStatus(meetingId, status);
       if (!meetingData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No meeting data found");

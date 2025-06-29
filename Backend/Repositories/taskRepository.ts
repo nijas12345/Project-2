@@ -1,52 +1,49 @@
 import { Model, Types } from "mongoose";
 import { ITaskRepository } from "../Interfaces/task.repository.interface";
-import { IComments, ITask, IUser } from "../Interfaces/commonInterface";
+import { IComments} from "../Interfaces/commonInterface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import { CommentDoc, CommentInput, TaskDoc, TaskInput } from "../Model/taskModal";
+import BaseRepository from "./base/baseRepository";
 
-class TaskRepository implements ITaskRepository {
-  private taskModel = Model<ITask>;
+class TaskRepository extends BaseRepository<TaskDoc> implements ITaskRepository {
+  private taskModel = Model<TaskDoc>;
   constructor(
-    taskModel: Model<ITask>
+    taskModel: Model<TaskDoc>
   ) {
+    super(taskModel)
     this.taskModel = taskModel;
   }
-  taskFindById = async(taskId: Types.ObjectId): Promise<ITask | null> => {
+  taskFindById = async(taskId: Types.ObjectId): Promise<TaskDoc | null> => {
     try {
-      const taskData: ITask | null = await this.taskModel.findOne({
-        _id: taskId,
-      });
-      return taskData
+      return await this.findById(taskId);
     } catch (error:unknown) {
       throw error
     }
   }
-  taskDetails = async (task: ITask): Promise<ITask> => {
+  taskDetails = async (task: TaskInput): Promise<TaskDoc> => {
     try {
-      const taskData = await this.taskModel.create(task);
-      return taskData;
+      return await this.createData(task);
     } catch (error:unknown) {
       throw error;
     }
   };
-  editTask = async (taskId:Types.ObjectId,updateFields:ITask): Promise<ITask|null> => {
+  editTask = async (taskId:Types.ObjectId,updateFields:TaskInput): Promise<TaskDoc|null> => {
     try {
-        const taskData:ITask|null = await this.taskModel.findByIdAndUpdate(
-          { _id: taskId },
+        return await this.taskModel.findByIdAndUpdate(
+          taskId,
           { $set: updateFields },
           { new: true }
         );
-        return taskData;
     } catch (error:unknown) {
       throw error
     }
   };  
   showTask = async (
     taskId: string
-  ): Promise<ITask|null> => {
+  ): Promise<TaskDoc|null> => {
     try {
-      const task: ITask | null = await this.taskModel.findOne({ _id: taskId });
-      return  task 
+      return await this.findOne({ _id: taskId });
     } catch(error:unknown) {
       throw error;
     }
@@ -55,12 +52,12 @@ class TaskRepository implements ITaskRepository {
     taskId: string,
     status: string,
     projectId: string
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
-      const taskData: ITask | null = await this.taskModel.findByIdAndUpdate(
-        { _id: taskId },
+      const taskData: TaskDoc | null = await this.findByIdAndUpdate(
+        taskId,
         {
-          status: status,
+          status
         },
         { new: true }
       );
@@ -69,7 +66,7 @@ class TaskRepository implements ITaskRepository {
   throw new HttpError(HTTP_statusCode.NotFound, "No Task Data found");
 }
       if (!projectId) {
-        const tasks: ITask[] = await this.taskModel
+        const tasks: TaskDoc[] = await this.taskModel
           .find({
             member: taskData.member,
             acceptanceStatus: "active",
@@ -79,7 +76,7 @@ class TaskRepository implements ITaskRepository {
           });
         return tasks;
       } else {
-        const tasks: ITask[] = await this.taskModel
+        return await this.taskModel
           .find({
             member: taskData.member,
             acceptanceStatus: "active",
@@ -88,37 +85,34 @@ class TaskRepository implements ITaskRepository {
           .sort({
             createdAt: -1,
           });
-        return tasks;
       }
     } catch(error:unknown) {
       throw error;
     }
   };
-  deleteTask = async (taskId: string): Promise<ITask|null> => {
+  deleteTask = async (taskId: string): Promise<TaskDoc|null> => {
     try {
-      const taskData: ITask | null = await this.taskModel.findByIdAndDelete(
+      return await this.taskModel.findByIdAndDelete(
         taskId
       );
-      return taskData
+
     } catch(error:unknown) {
       throw error
     }
   };
   findAllTasks = async (
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
-      const taskData: ITask[] = await this.taskModel.find();
-      return taskData;
+      return await this.findAll();
     } catch(error:unknown) {
       throw error
     }
   };
-  adminCountTasks = async (admin_id: string): Promise<ITask[]> => {
+  adminCountTasks = async (admin_id: string): Promise<TaskDoc[]> => {
     try {
-      const taskData: ITask[] = await this.taskModel.find({
-        admin_id: admin_id,
+      return await this.findAll({
+        admin_id
       });
-      return taskData;
     } catch (error) {
       throw error
     }
@@ -126,33 +120,29 @@ class TaskRepository implements ITaskRepository {
   adminTasks = async (
     admin_id: string,
     projectId: string | null
-  ): Promise<ITask[] > => {
+  ): Promise<TaskDoc[] > => {
     try {
       if (projectId == "unassigned") {
-        const taskData: ITask[]  = await this.taskModel.find({
+        return await this.taskModel.find({
           admin_id: admin_id,
           acceptanceStatus: "unAssigned",
         });
-        return taskData;
       } else if (projectId == "reassigned") {
-        const taskData: ITask[] | null = await this.taskModel.find({
+        return await this.findAll({
           admin_id: admin_id,
           acceptanceStatus: "reAssigned",
         });
-        return taskData;
+
       } else if (!projectId) {
-        const taskData: ITask[] | null = await this.taskModel.find({
+        return await this.findAll({
           admin_id: admin_id,
           acceptanceStatus: "active",
         });
-        return taskData;
       } else {
-        const taskData: ITask[] | null = await this.taskModel.find({
+        return await this.taskModel.find({
           projectId: projectId,
           acceptanceStatus: "active",
         });
-        console.log("withproject", taskData.length);
-        return taskData;
       }
     } catch (error) {
       throw error;
@@ -161,16 +151,15 @@ class TaskRepository implements ITaskRepository {
   userTasks = async (
     email: string,
     projectId: string | null
-  ): Promise<ITask[] > => {
+  ): Promise<TaskDoc[] > => {
     try {
       if (projectId == "unassigned") {
-        const taskData: ITask[] | null = await this.taskModel.find({
+        return await this.findAll({
           member: email.trim(),
           acceptanceStatus: "unAssigned",
         });
-        return taskData;
       } else if (!projectId) {
-        const taskData: ITask[] | null = await this.taskModel
+        return await this.taskModel
           .find({
             member: email,
             acceptanceStatus: "active",
@@ -179,9 +168,8 @@ class TaskRepository implements ITaskRepository {
             acceptanceStatus: -1,
             createdAt: -1,
           });
-        return taskData;
       } else if (projectId == "me") {
-        const taskData: ITask[] | null = await this.taskModel
+        return await this.taskModel
           .find({
             member: email,
             projectId: projectId,
@@ -190,9 +178,8 @@ class TaskRepository implements ITaskRepository {
           .sort({
             createdAt: -1,
           });
-        return taskData;
       } else {
-        const taskData: ITask[] | null = await this.taskModel
+        return await this.taskModel
           .find({
             member: email,
             projectId: projectId,
@@ -201,7 +188,6 @@ class TaskRepository implements ITaskRepository {
           .sort({
             createdAt: -1,
           });
-        return taskData;
       }
     } catch (error:unknown) {
       throw error;
@@ -209,38 +195,34 @@ class TaskRepository implements ITaskRepository {
   };
   addComment = async (
     taskId: string,
-    commentData: IComments
-  ): Promise<ITask | null> => {
+    commentData: CommentInput
+  ): Promise<TaskDoc | null> => {
     try {
-      const taskData: ITask | null = await this.taskModel.findOneAndUpdate(
+      return await this.findOneAndUpdate(
         { _id: taskId },
         { $push: { comments: commentData } },
-        { new: true }
       );
-      return taskData;
     } catch (error:unknown) {
       throw error;
     }
   };
   addAdminComment = async (
     taskId: string,
-    commentData: IComments
-  ): Promise<ITask | null> => {
+    commentData: CommentInput
+  ): Promise<TaskDoc | null> => {
     try {
-      const taskData: ITask | null = await this.taskModel.findOneAndUpdate(
+      const taskData: TaskDoc | null = await this.findOneAndUpdate(
         { _id: taskId },
         { $push: { comments: commentData } },
-        { new: true }
       );
       return taskData;
     } catch (error:unknown) {
       throw error;
     }
   };
-  deleteComment = async (id: string): Promise<IComments | null> => {
+  deleteComment = async (id: string): Promise<CommentDoc | null> => {
     try {
-      console.log("id", id);
-      const result: IComments | null = await this.taskModel.findOneAndUpdate(
+       return await this.taskModel.findOneAndUpdate(
         { "comments._id": id },
         {
           $pull: {
@@ -250,14 +232,13 @@ class TaskRepository implements ITaskRepository {
         { new: true }
       );
 
-      return result;
-    } catch (error) {
+    } catch (error:unknown) {
       throw error
     }
   };
-  deleteUserComment = async (id: string): Promise<IComments | null> => {
+  deleteUserComment = async (id: string): Promise<CommentDoc | null> => {
     try {
-      const result: IComments | null = await this.taskModel.findOneAndUpdate(
+      return await this.taskModel.findOneAndUpdate(
         { "comments._id": id },
         {
           $pull: {
@@ -266,7 +247,6 @@ class TaskRepository implements ITaskRepository {
         },
         { new: true }
       );
-      return result;
     } catch (error:unknown) {
       throw error
     }
@@ -274,9 +254,9 @@ class TaskRepository implements ITaskRepository {
   assignedStatus = async (
     taskId: string,
     acceptanceStatus: string
-  ): Promise<ITask | null> => {
+  ): Promise<TaskDoc | null> => {
     try {
-      const taskData: ITask | null = await this.taskModel.findByIdAndUpdate(
+      const taskData: TaskDoc | null = await this.findByIdAndUpdate(
         taskId,
         {
           acceptanceStatus: acceptanceStatus,
@@ -284,7 +264,7 @@ class TaskRepository implements ITaskRepository {
         { new: true }
       );
       if (acceptanceStatus == "reAssigned") {
-        const taskData = await this.taskModel.findByIdAndUpdate(taskId, {
+        await this.taskModel.findByIdAndUpdate(taskId, {
           member: "",
         });
       }
@@ -296,10 +276,10 @@ class TaskRepository implements ITaskRepository {
   getSearchResults = async (
     query: string,
     projectId: string
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
       if (projectId === "unassigned") {
-        const searchResults: ITask[] = await this.taskModel.find({
+        const searchResults: TaskDoc[] = await this.findAll({
           taskName: { $regex: query, $options: "i" },
           acceptanceStatus: "unAssigned",
         });
@@ -307,22 +287,21 @@ class TaskRepository implements ITaskRepository {
 
         return searchResults;
       } else if (projectId == "reassigned") {
-        const searchResults: ITask[] = await this.taskModel.find({
+        const searchResults: TaskDoc[] = await this.findAll({
           taskName: { $regex: query, $options: "i" },
           acceptanceStatus: "reAssigned",
         });
-        console.log("searchR", searchResults);
 
         return searchResults;
       } else if (projectId.length > 14) {
-        const searchResults: ITask[] = await this.taskModel.find({
+        const searchResults: TaskDoc[] = await this.findAll({
           taskName: { $regex: query, $options: "i" },
           projectId: projectId,
           acceptanceStatus: "active",
         });
         return searchResults;
       } else {
-        const searchResults: ITask[] = await this.taskModel.find({
+        const searchResults: TaskDoc[] = await this.findAll({
           taskName: { $regex: query, $options: "i" },
           acceptanceStatus: "active",
         });

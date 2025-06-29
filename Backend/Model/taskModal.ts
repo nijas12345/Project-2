@@ -1,7 +1,6 @@
-import mongoose, { Schema, model } from "mongoose";
-import { IComments, ITask } from "../Interfaces/commonInterface";
+import { InferSchemaType, Schema, Types, model } from "mongoose";
 
-const commentSchema: Schema = new Schema<IComments>({
+const commentSchema = new Schema({
   user: {
     type: String,
   },
@@ -12,7 +11,8 @@ const commentSchema: Schema = new Schema<IComments>({
     type: Date,
   },
 });
-const taskSchema: Schema = new Schema<ITask>({
+
+const taskSchema = new Schema({
   admin_id: {
     type: String,
     ref: "Admin",
@@ -31,7 +31,7 @@ const taskSchema: Schema = new Schema<ITask>({
     required: true,
   },
   projectId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Types.ObjectId,
     ref: "Project",
     required: true,
   },
@@ -45,14 +45,22 @@ const taskSchema: Schema = new Schema<ITask>({
     type: String,
     enum: ["unAssigned", "active", "reAssigned"],
     default: "unAssigned",
+    required:false
   },
   status: {
     type: String,
     enum: ["pending", "inProgress", "completed"],
     default: "pending",
+    required:false
   },
   comments: [commentSchema],
 });
 
-const Task = model<ITask>("Task", taskSchema);
-export default Task;
+export type CommentInput = InferSchemaType<typeof commentSchema>
+export type CommentDoc = CommentInput & {_id:Types.ObjectId}
+
+export type TaskInput = InferSchemaType<typeof taskSchema>
+export type TaskDoc = TaskInput & {_id:Types.ObjectId}
+
+const taskModel = model<TaskDoc>("Task", taskSchema);
+export default taskModel;

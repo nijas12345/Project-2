@@ -1,5 +1,6 @@
 import HTTP_statusCode from "../Enums/httpStatusCode";
-import { IComments, ITask, IUser } from "../Interfaces/commonInterface";
+import { UserDoc } from "../Model/userModal";
+import { CommentDoc, CommentInput, TaskDoc, TaskInput } from "../Model/taskModal";
 import { ITaskRepository } from "../Interfaces/task.repository.interface";
 import { ITaskService } from "../Interfaces/task.service.interface";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
@@ -15,21 +16,21 @@ class TaskServices implements ITaskService {
     this.taskRepository = taskRepository;
     this.userRepository = userRepository;
   }
-  taskDetails = async (task: ITask): Promise<ITask> => {
+  taskDetails = async (task: TaskInput): Promise<TaskDoc> => {
     try {
       return await this.taskRepository.taskDetails(task);
     } catch (error: unknown) {
       throw error;
     }
   };
-  editTask = async (task: ITask): Promise<ITask> => {
+  editTask = async (task: TaskDoc): Promise<TaskDoc> => {
     try {
       if (!task._id) {
         throw new HttpError(HTTP_statusCode.BadRequest, "No Task ID provided");
       }
 
       const taskId = task._id;
-      const taskDetails: ITask | null = await this.taskRepository.taskFindById(
+      const taskDetails: TaskDoc | null = await this.taskRepository.taskFindById(
         taskId
       );
 
@@ -37,7 +38,8 @@ class TaskServices implements ITaskService {
         throw new HttpError(HTTP_statusCode.NotFound, "No task data available");
       }
       if (taskDetails.member == task.member) {
-        const updateFields: ITask = {
+        const updateFields: TaskDoc = {
+          _id:task._id,
           admin_id: task.admin_id,
           taskName: task.taskName,
           description: task.description,
@@ -49,7 +51,7 @@ class TaskServices implements ITaskService {
         if (task.taskImage) {
           updateFields.taskImage = task.taskImage;
         }
-        const taskData: ITask | null = await this.taskRepository.editTask(
+        const taskData: TaskDoc | null = await this.taskRepository.editTask(
           taskId,
           updateFields
         );
@@ -61,7 +63,8 @@ class TaskServices implements ITaskService {
         }
         return taskData;
       } else {
-        const updateFields: ITask = {
+        const updateFields: TaskDoc = {
+          _id:task._id,
           admin_id: task.admin_id,
           taskName: task.taskName,
           description: task.description,
@@ -75,7 +78,7 @@ class TaskServices implements ITaskService {
         if (task.taskImage) {
           updateFields.taskImage = task.taskImage;
         }
-        const taskData: ITask | null = await this.taskRepository.editTask(
+        const taskData: TaskDoc | null = await this.taskRepository.editTask(
           taskId,
           updateFields
         );
@@ -94,9 +97,9 @@ class TaskServices implements ITaskService {
   showTask = async (
     user_id: string,
     taskId: string
-  ): Promise<ITask | { isAuth: boolean; taskData: ITask }> => {
+  ): Promise<TaskDoc | { isAuth: boolean; taskData: TaskDoc }> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!userData) {
@@ -110,7 +113,7 @@ class TaskServices implements ITaskService {
         );
       }
       if (userData.email == taskData.member) {
-        return taskData;
+      return taskData;
       } else {
         throw new HttpError(
           HTTP_statusCode.NoAccess,
@@ -125,7 +128,7 @@ class TaskServices implements ITaskService {
     taskId: string,
     status: string,
     projectId: string
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
       const taskData = await this.taskRepository.updateTaskStatus(
         taskId,
@@ -139,7 +142,7 @@ class TaskServices implements ITaskService {
   };
   deleteTask = async (taskId: string): Promise<void> => {
     try {
-      const taskData: ITask | null = await this.taskRepository.deleteTask(
+      const taskData: TaskDoc | null = await this.taskRepository.deleteTask(
         taskId
       );
       if (!taskData) {
@@ -157,7 +160,7 @@ class TaskServices implements ITaskService {
   ): Promise<{ pending: number; inProgress: number; completed: number }> => {
     try {
       const taskData = await this.taskRepository.findAllTasks();
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!taskData) {
@@ -193,7 +196,7 @@ class TaskServices implements ITaskService {
     admin_id: string
   ): Promise<{ pending: number; inProgress: number; completed: number }> => {
     try {
-      const taskData: ITask[] = await this.taskRepository.adminCountTasks(
+      const taskData: TaskDoc[] = await this.taskRepository.adminCountTasks(
         admin_id
       );
       let pending: number = 0;
@@ -220,9 +223,9 @@ class TaskServices implements ITaskService {
   adminTasks = async (
     admin_id: string,
     projectId: string | null
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
-      const tasks: ITask[] = await this.taskRepository.adminTasks(
+      const tasks: TaskDoc[] = await this.taskRepository.adminTasks(
         admin_id,
         projectId
       );
@@ -234,16 +237,16 @@ class TaskServices implements ITaskService {
   userTasks = async (
     user_id: string,
     projectId: string | null
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!userData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No User Data");
       }
       const email = userData.email;
-      const tasks: ITask[] | null = await this.taskRepository.userTasks(
+      const tasks: TaskDoc[] | null = await this.taskRepository.userTasks(
         email,
         projectId
       );
@@ -254,10 +257,10 @@ class TaskServices implements ITaskService {
   };
   addComment = async (
     taskId: string,
-    commentData: IComments
-  ): Promise<ITask> => {
+    commentData: CommentInput
+  ): Promise<TaskDoc> => {
     try {
-      const taskData: ITask | null = await this.taskRepository.addComment(
+      const taskData: TaskDoc | null = await this.taskRepository.addComment(
         taskId,
         commentData
       );
@@ -274,10 +277,10 @@ class TaskServices implements ITaskService {
   };
   addAdminComment = async (
     taskId: string,
-    commentData: IComments
-  ): Promise<ITask> => {
+    commentData: CommentInput
+  ): Promise<TaskDoc> => {
     try {
-      const taskData: ITask | null = await this.taskRepository.addAdminComment(
+      const taskData: TaskDoc | null = await this.taskRepository.addAdminComment(
         taskId,
         commentData
       );
@@ -292,11 +295,10 @@ class TaskServices implements ITaskService {
       throw error;
     }
   };
-  deleteComment = async (id: string): Promise<IComments> => {
+  deleteComment = async (id: string): Promise<CommentDoc> => {
     try {
-      console.log("id", id);
 
-      const result: IComments | null = await this.taskRepository.deleteComment(
+      const result: CommentDoc | null = await this.taskRepository.deleteComment(
         id
       );
       if (!result) {
@@ -307,9 +309,9 @@ class TaskServices implements ITaskService {
       throw error;
     }
   };
-  deleteUserComment = async (id: string): Promise<IComments> => {
+  deleteUserComment = async (id: string): Promise<CommentDoc> => {
     try {
-      const result: IComments | null =
+      const result: CommentDoc | null =
         await this.taskRepository.deleteUserComment(id);
       if (!result) {
         throw new Error("No comment has been deleted");
@@ -322,9 +324,9 @@ class TaskServices implements ITaskService {
   assignedStatus = async (
     taskId: string,
     acceptanceStatus: string
-  ): Promise<ITask> => {
+  ): Promise<TaskDoc> => {
     try {
-      const taskData: ITask | null = await this.taskRepository.assignedStatus(
+      const taskData: TaskDoc | null = await this.taskRepository.assignedStatus(
         taskId,
         acceptanceStatus
       );
@@ -342,9 +344,9 @@ class TaskServices implements ITaskService {
   getSearchResults = async (
     query: string,
     projectId: string
-  ): Promise<ITask[]> => {
+  ): Promise<TaskDoc[]> => {
     try {
-      const searchResults: ITask[] = await this.taskRepository.getSearchResults(
+      const searchResults: TaskDoc[] = await this.taskRepository.getSearchResults(
         query,
         projectId
       );

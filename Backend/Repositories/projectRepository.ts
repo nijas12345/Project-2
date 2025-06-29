@@ -1,94 +1,79 @@
 import { Model, Types } from "mongoose";
 import { IProjectRepository } from "../Interfaces/project.repository.interface";
-import {
-  IMessage,
-  IProject,
-  IUser,
-  Projects,
-  LatestMessage,
-  IAdmin,
-  IPayment,
-  ITask,
-  ICompany,
-  IMember,
-} from "../Interfaces/commonInterface";
+import { MemberInput, ProjectDoc, ProjectInput } from "../Model/projectModal";
+import { Projects } from "../Interfaces/commonInterface";
+import BaseRepository from "./base/baseRepository";
 
-class ProjectRepository implements IProjectRepository {
+class ProjectRepository extends BaseRepository<ProjectDoc> implements IProjectRepository {
 
-  private projectModel = Model<IProject>;
+  private projectModel = Model<ProjectDoc>;
   constructor(
-    projectModel: Model<IProject>,
+    projectModel: Model<ProjectDoc>,
   ) {
+    super(projectModel)
     this.projectModel = projectModel;
   }
   createProject = async (
-    project: IProject
-  ): Promise<IProject | null> => {
+    project: ProjectInput
+  ): Promise<ProjectDoc | null> => {
     try {
-    const projectData:IProject|null = await this.projectModel.create(project);
-    return projectData;
+    return await this.createData(project);
     } catch(error:unknown) {
       throw error;
     }
   };
-  existingProjectByAdminId = async(admin_id: string): Promise<IProject[]> => {
+  existingProjectByAdminId = async(admin_id: string): Promise<ProjectDoc[]> => {
     try {
-      const existingProjects: IProject[] = await this.projectModel.find({
-        admin_id: admin_id,
+      return await this.findAll({
+        admin_id
       });
-      return existingProjects
     } catch (error:unknown) {
       throw error
     }
   }
-  getProjects = async (email: string): Promise<Projects[]> => {
+  getProjects = async (email: string): Promise<ProjectDoc[]> => {
     try {
-      const projects: Projects[] = await this.projectModel
+      return await this.projectModel
         .find({
           members: { $elemMatch: { email: email } },
         })
         .sort({ createdAt: -1 });
-      return projects;
     } catch(error:unknown) {
       throw error;
     }
   };
-  getAdminProjects = async (admin_id: string): Promise<Projects[]> => {
+  getAdminProjects = async (admin_id: string): Promise<ProjectDoc[]> => {
     try {
-      const projects: Projects[] = await this.projectModel
+      return await this.projectModel
         .find({ admin_id: admin_id })
         .sort({ createdAt: -1 });
-      return projects;
     } catch(error:unknown) {
       throw error;
     }
   };
-  getMeetings = async (email: string): Promise<IProject[]> => {
+  getMeetings = async (email: string): Promise<ProjectDoc[]> => {
     try {
-      const projectData: IProject[] = await this.projectModel.find({
+      return await this.findAll({
         "members.email": email,
       });
-      return projectData;
     } catch(error:unknown) {
       throw error;
     }
   };
-   getAdminMeetings = async (admin_id: string): Promise<IProject[]> => {
+   getAdminMeetings = async (admin_id: string): Promise<ProjectDoc[]> => {
       try {
-        const projectData: IProject[] = await this.projectModel.find({
-          admin_id: admin_id,
+        return await this.findAll({
+          admin_id
         });
-        return projectData;
       } catch(error:unknown) {
         throw error;
       }
     };
-    findProjectById = async (projectId: string|Types.ObjectId): Promise<IProject | null> => {
+    findProjectById = async (projectId: string|Types.ObjectId): Promise<ProjectDoc | null> => {
       try {
-        const projectData: IProject | null = await this.projectModel.findById(
+        return await this.projectModel.findById(
         projectId
       );
-      return projectData
       } catch (error) {
         throw error
       }
@@ -98,8 +83,8 @@ class ProjectRepository implements IProjectRepository {
     projectId:Types.ObjectId,
     name:string,
     description:string,
-    members:IMember[]
-  ): Promise<Projects[]> => {
+    members:MemberInput[]
+  ): Promise<ProjectDoc[]> => {
     try {
       const updateProject = {
         admin_id,
@@ -107,27 +92,26 @@ class ProjectRepository implements IProjectRepository {
         description,
         members
       };
-      await this.projectModel.findOneAndUpdate(
+      await this.findOneAndUpdate(
         { _id: projectId },
         {
           $set: updateProject,
         }
       );
-      const projects = await this.projectModel
+      return await this.projectModel
         .find({ admin_id: admin_id })
         .sort({ createdAt: -1 });
-      return projects;
+
     } catch(error:unknown) {
       console.log(error);
       throw error;
     }
   };
-  projectMembers = async (projectId: string): Promise<IProject | null> => {
+  projectMembers = async (projectId: string): Promise<ProjectDoc | null> => {
     try {
-      const projectData: IProject | null = await this.projectModel.findOne({
+      return await this.findOne({
         _id: projectId,
       });
-      return projectData;
     } catch(error:unknown) {
       throw error;
     }
@@ -135,43 +119,39 @@ class ProjectRepository implements IProjectRepository {
   deleteProject = async (
     admin_id: string,
     projectId: string
-  ): Promise<Projects[]> => {
+  ): Promise<ProjectDoc[]> => {
     try {
-      await this.projectModel.findOneAndDelete({ _id: projectId });
-      const projects: Projects[] = await this.projectModel.find({
-        admin_id: admin_id,
+      await this.deleteOne({ _id: projectId });
+      return await this.projectModel.find({
+        admin_id
       });
-      return projects;
     } catch(error:unknown) {
       throw error;
     }
   };
   combinedProjects = async (user_id:string,userEmail: string): Promise<Projects[]> => {
     try {
-      const combinedProjects: Projects[] = await this.projectModel.find({
+      return await this.projectModel.find({
         $or: [{ "members.email": userEmail }, { user_id: user_id }],
       });
-     return combinedProjects
     } catch(error:unknown) {
       throw error;
     }
   };
   combinedAdminProjects = async (admin_id:string):Promise<Projects[]> =>{
     try {
-      const combinedProjects: Projects[] = await this.projectModel.find({
-        admin_id: admin_id,
+      return await this.projectModel.find({
+        admin_id
       });
-      return combinedProjects
     } catch (error) {
       throw error
     }
   }
   countProjectDocuments = async (admin_id: string): Promise<number> => {
     try {
-      const projectCount = await this.projectModel.countDocuments({
-        admin_id: admin_id,
+      return await this.projectModel.countDocuments({
+        admin_id
       });
-      return projectCount
     } catch (error) {
       throw error
     }

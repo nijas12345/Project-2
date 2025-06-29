@@ -4,7 +4,7 @@ import HTTP_statusCode from "../Enums/httpStatusCode";
 import { IProject } from "../Interfaces/commonInterface";
 import { HttpStatusCode } from "axios";
 import { handleError } from "../Utils/handleError";
-import { error } from "console";
+import { ProjectDoc, ProjectInput } from "../Model/projectModal";
 
 class ProjectController {
   private projectService: IProjectService;
@@ -14,7 +14,7 @@ class ProjectController {
   createProject = async (req: Request, res: Response) => {
     try {
       const admin_id: string = req.admin_id as string;
-      const projectData: IProject = req.body;
+      const projectData: ProjectInput = req.body;
       const serviceResponse = await this.projectService.createProject(
         admin_id,
         projectData
@@ -47,7 +47,7 @@ class ProjectController {
   updateProject = async (req: Request, res: Response) => {
     try {
       const admin_id: string = req.admin_id as string;
-      const projectData: IProject = req.body;
+      const projectData: ProjectDoc = req.body;
       const serviceResponse = await this.projectService.updateProject(
         admin_id,
         projectData
@@ -106,7 +106,7 @@ class ProjectController {
 
   getSelectedProject = async (req: Request, res: Response) => {
     try {
-      const project = req.body.project as IProject;
+      const project = req.body.project as ProjectDoc;
       const serviceResponse = await this.projectService.getSelectedProject(
         project
       );

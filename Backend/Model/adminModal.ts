@@ -1,9 +1,9 @@
-import { Schema, model } from "mongoose";
-import { IAdmin } from "../Interfaces/commonInterface";
+import { Schema, model , InferSchemaType, Types } from "mongoose";
 
-const adminSchema: Schema = new Schema<IAdmin>({
+const adminSchema = new Schema({
   admin_id: {
     type: String,
+    required:true
   },
   firstName: {
     type: String,
@@ -43,5 +43,8 @@ const adminSchema: Schema = new Schema<IAdmin>({
   },
 });
 
-const Admin = model<IAdmin>("Admin", adminSchema);
-export default Admin;
+export type AdminInput = InferSchemaType<typeof adminSchema>;
+export type AdminDoc = AdminInput & { _id?: Types.ObjectId };
+const Admin = model<AdminDoc>('Admin',adminSchema);
+export default Admin
+

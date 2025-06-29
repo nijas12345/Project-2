@@ -1,9 +1,10 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { InferSchemaType, Schema, Types, model } from "mongoose";
 import { IUser } from "../Interfaces/commonInterface";
 
-const userSchema: Schema = new Schema<IUser>({
+const userSchema= new Schema({
   user_id: {
     type: String,
+    required:true
   },
   firstName: {
     type: String,
@@ -36,6 +37,9 @@ const userSchema: Schema = new Schema<IUser>({
   state: {
     type: String,
   },
+  city:{
+    type:String,
+  },
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Company",
@@ -52,5 +56,9 @@ const userSchema: Schema = new Schema<IUser>({
   },
 });
 
-const User = model<IUser>("User", userSchema);
-export default User;
+export type UserInput = InferSchemaType<typeof userSchema>
+export type UserDoc = UserInput & {_id?:Types.ObjectId};
+
+const userModel = model<UserDoc>("User",userSchema);
+
+export default userModel

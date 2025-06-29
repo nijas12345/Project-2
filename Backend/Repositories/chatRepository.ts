@@ -1,23 +1,26 @@
 import { Model } from "mongoose";
 import { IChatRepository } from "../Interfaces/chat.repository.interface";
-import { IMessage, LatestMessage, Projects } from "../Interfaces/commonInterface";
+import { LatestMessage, Projects } from "../Interfaces/commonInterface";
+import { MessageDoc } from "../Model/chatModal";
+import BaseRepository from "./base/baseRepository";
 
-class ChatRepository implements IChatRepository {
-  private chatModel = Model<IMessage>;
-  constructor(chatModel: Model<IMessage>) {
+class ChatRepository extends BaseRepository<MessageDoc> implements IChatRepository {
+  private chatModel = Model<MessageDoc>;
+  constructor(chatModel: Model<MessageDoc>) {
+    super(chatModel)
     this.chatModel = chatModel;
   }
   getChats = async (
     projectId: string,
     pageNumber: number,
     limitNumber: number
-  ): Promise<IMessage[]> => {
+  ): Promise<MessageDoc[]> => {
     try {
-      const chatData: IMessage[] = await this.chatModel
+      const chatData: MessageDoc[] = await this.chatModel
         .find({ projectId: projectId })
-        .sort({ _id: -1 }) // Get newest chats first
-        .skip((pageNumber - 1) * limitNumber) // Pagination logic
-        .limit(limitNumber); // Use limitNumber parameter
+        .sort({ _id: -1 }) 
+        .skip((pageNumber - 1) * limitNumber) 
+        .limit(limitNumber); 
 
       const sortedChatData = chatData.reverse() // Reverse to chronological order
       return sortedChatData;
@@ -29,9 +32,9 @@ class ChatRepository implements IChatRepository {
     projectId: string,
     pageNumber: number,
     limitNumber: number
-  ): Promise<IMessage[] > => {
+  ): Promise<MessageDoc[] > => {
     try {
-      const chatData: IMessage[] = await this.chatModel
+      const chatData: MessageDoc[] = await this.chatModel
         .find({ projectId: projectId })
         .sort({ _id: -1 }) // Get newest chats first
         .skip((pageNumber - 1) * limitNumber) // Pagination logic
@@ -43,19 +46,17 @@ class ChatRepository implements IChatRepository {
       throw error;
     }
   };
-  saveChats = async (messageDetails: IMessage): Promise<IMessage> => {
+  saveChats = async (messageDetails: MessageDoc): Promise<MessageDoc> => {
     try {
-      const savedMessage = await this.chatModel.create(messageDetails);
-      return savedMessage;
+      return this.createData(messageDetails);
     } catch (error: unknown) {
       throw error;
     }
   };
-  saveFiles = async (messageWithFile: IMessage): Promise<IMessage> => {
+  saveFiles = async (messageWithFile: MessageDoc): Promise<MessageDoc> => {
     try {
-      delete messageWithFile._id;
-      const savedMessage = await this.chatModel.create(messageWithFile);
-      return savedMessage;
+      // delete messageWithFile._id;
+      return await this.createData(messageWithFile);
     } catch (error: unknown) {
       throw error;
     }

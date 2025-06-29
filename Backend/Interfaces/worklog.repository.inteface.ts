@@ -1,9 +1,10 @@
-import { IWorkLog,Statistics } from "./commonInterface"
+import { WorkLogDoc } from "../Model/clockModal"
+import { Statistics } from "./commonInterface"
 
 export interface IWorkLogRepository{
     clockIn(user_id:string,date:Date):Promise<Date|number>
     clockOut(user_id:string,date:Date):Promise<number>
-    clockStatus(user_id:string):Promise<IWorkLog|null>
+    clockStatus(user_id:string):Promise<WorkLogDoc|null>
     clockBreakStart(user_id:string):Promise<void>
     clockBreakEnd(user_id:string):Promise<void>
     scheduleClockStatus(user_id:string):Promise<void>

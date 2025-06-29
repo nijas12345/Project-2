@@ -1,9 +1,8 @@
-import mongoose, { mongo } from "mongoose";
-import { IWorkLog } from "../Interfaces/commonInterface";
-const workLogSchema = new mongoose.Schema({
+import mongoose, { Schema, InferSchemaType, Types } from "mongoose";
+
+const workLogSchema = new Schema({
   user_id: {
     type: String,
-    ref: "User",
     required: true,
   },
   date: {
@@ -16,29 +15,36 @@ const workLogSchema = new mongoose.Schema({
   },
   clockOut: {
     type: Date,
-    default: Date.now,
-  },
-  breakStart: {
-    type: Date,
-  },
-  breakEnd: {
-    type: Date,
+    required: true,
   },
   breakDuration: {
     type: Number,
-    default: 0,
+    required: true,
+  },
+  breakStart: {
+    type: Date,
+    required: true,
+  },
+  breakEnd: {
+    type: Date,
+    required: true,
   },
   workDuration: {
     type: Number,
-    default: 0,
+    required: true,
   },
   isClockedIn: {
     type: Boolean,
+    default: false,
   },
   isOnBreak: {
     type: Boolean,
+    default: false,
   },
 });
 
-const WorkLog = mongoose.model<IWorkLog>("WorkLog", workLogSchema);
-export default WorkLog;
+export type WorkLogInput = InferSchemaType<typeof workLogSchema>;
+export type WorkLogDoc = WorkLogInput & { _id: Types.ObjectId };
+
+export const workLogModel = mongoose.model<WorkLogDoc>("WorkLog", workLogSchema);
+export default workLogModel;

@@ -1,8 +1,7 @@
-import mongoose, { Schema } from "mongoose";
-import { IMeeting, IMember } from "../Interfaces/commonInterface";
+import mongoose, { InferSchemaType, Schema, Types } from "mongoose";
 
 // Define the Message Schema
-const memberSchema: Schema = new Schema<IMember>({
+const memberSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -13,7 +12,7 @@ const memberSchema: Schema = new Schema<IMember>({
   },
 });
 
-const meetingSchema: Schema = new Schema({
+const meetingSchema = new Schema({
   admin_id: {
     type: String,
     ref: "Admin",
@@ -29,7 +28,7 @@ const meetingSchema: Schema = new Schema({
     type: Number,
   },
   projectId: {
-    type: mongoose.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Project",
     required: true,
   },
@@ -50,5 +49,11 @@ const meetingSchema: Schema = new Schema({
   members: [memberSchema],
 });
 
-const Meeting = mongoose.model<IMeeting>("Meeting", meetingSchema);
-export default Meeting;
+export type MemberInput = InferSchemaType<typeof memberSchema>
+export type MemberDoc = MemberInput & {_id:Types.ObjectId};
+
+export type MeetingInput = InferSchemaType<typeof meetingSchema>
+export type MeetingDoc = MeetingInput & {_id:Types.ObjectId}
+
+const MeetingModel = mongoose.model<MeetingDoc>("Meeting", meetingSchema);
+export default MeetingModel;

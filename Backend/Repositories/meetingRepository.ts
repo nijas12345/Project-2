@@ -1,20 +1,22 @@
 import { Model } from "mongoose";
-import { IMeeting } from "../Interfaces/commonInterface";
 import { IMeetingRepository } from "../Interfaces/meeting.repository.interface";
+import { MeetingDoc } from "../Model/meetingModal";
+import { IMeeting } from "../Interfaces/commonInterface";
+import BaseRepository from "./base/baseRepository";
 
-class MeetingRepository implements IMeetingRepository{
-    private meetingModel = Model<IMeeting>
-    constructor(meetingModel:Model<IMeeting>){
+class MeetingRepository extends BaseRepository<MeetingDoc> implements IMeetingRepository{
+    private meetingModel = Model<MeetingDoc>
+    constructor(meetingModel:Model<MeetingDoc>){
+     super(meetingModel)
      this.meetingModel = meetingModel
     }
   scheduleMeetings = async (
     meetingData:IMeeting
-  ): Promise<IMeeting|null> => {
+  ): Promise<MeetingDoc|null> => {
     try {
-      const meeting: IMeeting | null = await this.meetingModel.create(
+      return await this.meetingModel.create(
         meetingData
       );
-      return meeting
     } catch(error:unknown) {
       throw error;
     }
@@ -22,13 +24,12 @@ class MeetingRepository implements IMeetingRepository{
   fetchMeetings = async (
     userEmail: string,
     projectId: string
-  ): Promise<IMeeting[]> => {
+  ): Promise<MeetingDoc[]> => {
     try {
-      const meetingData = (await this.meetingModel.find({
+      return await this.meetingModel.find({
         "members.email": userEmail,
         projectId: projectId,
-      })) as IMeeting[];
-      return meetingData
+      })
     } catch(error:unknown) {
       throw error;
     }
@@ -36,16 +37,12 @@ class MeetingRepository implements IMeetingRepository{
   AdminfetchMeetings = async (
     admin_id: string,
     projectId: string
-  ): Promise<IMeeting[]> => {
+  ): Promise<MeetingDoc[]> => {
     try {
-      const meeting = await this.meetingModel.find();
-      console.log("mettng", meeting);
-
-      const meetingData = (await this.meetingModel.find({
+      return await this.meetingModel.find({
         admin_id: admin_id,
         projectId: projectId,
-      })) as IMeeting[];
-      return meetingData;
+      })
     } catch(error:unknown) {
       throw error;
     }
@@ -53,17 +50,14 @@ class MeetingRepository implements IMeetingRepository{
   updateMeetingStatus = async (
     meetingId: string,
     status: string
-  ): Promise<IMeeting | null> => {
+  ): Promise<MeetingDoc | null> => {
     try {
-      const meetingData: IMeeting | null =
-        await this.meetingModel.findByIdAndUpdate(
-          meetingId,
+      return  await this.findOneAndUpdate(
+          {meetingId},
           {
-            status: status,
-          },
-          { new: true }
+            status
+          }
         );
-      return meetingData;
     } catch(error:unknown) {
       throw error;
     }

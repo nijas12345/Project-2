@@ -1,10 +1,12 @@
 import { Model } from "mongoose";
-import { IPayment } from "../Interfaces/commonInterface";
 import { IPaymentRepository } from "../Interfaces/payment.repository.interface";
+import paymentModel, { PaymentDoc } from "../Model/paymentModal";
+import BaseRepository from "./base/baseRepository";
 
-class PaymentRepository implements IPaymentRepository {
-  private paymentModel = Model<IPayment>;
-  constructor(paymentModel: Model<IPayment>) {
+class PaymentRepository extends BaseRepository<PaymentDoc> implements IPaymentRepository {
+  private paymentModel = Model<PaymentDoc>;
+  constructor(paymentModel: Model<PaymentDoc>) {
+    super(paymentModel)
     this.paymentModel = paymentModel;
   }
   payment = async (
@@ -14,7 +16,7 @@ class PaymentRepository implements IPaymentRepository {
     customer: string
   ): Promise<void> => {
     try {
-      const newPayment = await this.paymentModel.create({
+       await this.paymentModel.create({
         admin_id,
         subscription,
         amount,
@@ -29,13 +31,12 @@ class PaymentRepository implements IPaymentRepository {
   paymentStatus = async (
     admin_id: string,
     status: string
-  ): Promise<IPayment | null> => {
+  ): Promise<PaymentDoc | null> => {
     try {
-      const paymentData: IPayment | null = await this.paymentModel.findOne({
-        admin_id: admin_id,
-        status: status
+      return await this.findOne({
+        admin_id,
+        status
       });
-      return paymentData;
     } catch (error) {
       throw error;
     }
@@ -43,22 +44,21 @@ class PaymentRepository implements IPaymentRepository {
 
   updatePaymentStatus = async (customerId: string): Promise<void> => {
     try {
-      await this.paymentModel.findOneAndUpdate(
+      await this.findOneAndUpdate(
         { customer: customerId, status: "active" },
         {
           status: "cancelled",
-        },
-        { new: true }
+        }
       );
     } catch (error: unknown) {
       throw error;
     }
   };
-  activeSubscription = async (admin_id: string): Promise<IPayment | null> => {
+  activeSubscription = async (admin_id: string): Promise<PaymentDoc | null> => {
     try {
-      return await this.paymentModel.findOne({
-        status: "active",
-        admin_id: admin_id,
+      return await this.findOne({
+        admin_id,
+        status: "active"
       });
     } catch (error: unknown) {
       throw error;

@@ -17,12 +17,14 @@ import fs, { promises as fsPromises } from "fs";
 import { Types } from "mongoose";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import { UserDoc } from "../Model/userModal";
+import { CompanyDoc } from "../Model/companyModal";
 
 const client = new OAuth2Client(`${process.env.Google_clientID}`);
 class UserServices implements IUserService {
   private userRepository: IUserRepository;
   private companyRepository: ICompanyRepository;
-  private userData: IUser | null = null;
+  private userData: UserDoc | null = null;
   private otp: string | null = null;
   private expiryOTP_time: Date | null = null;
   constructor(
@@ -35,7 +37,7 @@ class UserServices implements IUserService {
   login = async (
     email: string,
     password: string
-  ): Promise<{ userData: IUser; userToken: string; refreshToken: string }> => {
+  ): Promise<{ userData: UserDoc; userToken: string; refreshToken: string }> => {
     try {
       const userData = await this.userRepository.login(email);
       if (!userData) {
@@ -71,9 +73,9 @@ class UserServices implements IUserService {
     }
   };
 
-  register = async (userData: IUser): Promise<void> => {
+  register = async (userData: UserDoc): Promise<void> => {
     try {
-      const alreadyExists: IUser | null = await this.userRepository.findByEmail(
+      const alreadyExists: UserDoc | null = await this.userRepository.findByEmail(
         userData.email
       );
       
@@ -100,7 +102,7 @@ class UserServices implements IUserService {
       throw error;
     }
   };
-  otpVerification = async (enteredOTP: string): Promise<IUser> => {
+  otpVerification = async (enteredOTP: string): Promise<UserDoc> => {
     try {
       if (!this.userData) {
         throw new HttpError(HTTP_statusCode.NotFound, "User data not found");
@@ -125,7 +127,7 @@ class UserServices implements IUserService {
       if (this.userData.refferalCode) {
         const refferalCode: string = this.userData.refferalCode;
         const email: string = this.userData.email;
-        const companyData: ICompany | null =
+        const companyData: CompanyDoc | null =
           await this.companyRepository.updateCompanyRefferal(
             refferalCode,
             email
@@ -134,7 +136,7 @@ class UserServices implements IUserService {
           throw new HttpError(HTTP_statusCode.NotFound, "No company exist");
         }
       }
-      const response: IUser = await this.userRepository.register(this.userData);
+      const response: UserDoc = await this.userRepository.register(this.userData);
       this.otp = null;
       this.userData = null;
       return response;
@@ -168,7 +170,7 @@ class UserServices implements IUserService {
   };
   verifyGoogleAuth = async (
     token: string
-  ): Promise<{ userData: IUser; userToken: string; refreshToken: string }> => {
+  ): Promise<{ userData: UserDoc; userToken: string; refreshToken: string }> => {
     try {
       // Attempt to verify the Google token
       const ticket = await client.verifyIdToken({
@@ -184,7 +186,7 @@ class UserServices implements IUserService {
           "Invalid Google token or email not found in payload"
         );
       }
-      let userData: IUser | null = await this.userRepository.verifyGoogleAuth(
+      let userData: UserDoc | null = await this.userRepository.verifyGoogleAuth(
         payload.email
       );
       if (!userData) {
@@ -213,7 +215,7 @@ class UserServices implements IUserService {
   };
   resetPassword = async (email: string): Promise<void> => {
     try {
-      const userData: IUser | null = await this.userRepository.resetPassword(
+      const userData: UserDoc | null = await this.userRepository.resetPassword(
         email
       );
       if (!userData) {
@@ -271,7 +273,7 @@ class UserServices implements IUserService {
       throw error;
     }
   };
-  updateUser = async (user_id: string, user: IUser): Promise<IUser | null> => {
+  updateUser = async (user_id: string, user: UserDoc): Promise<UserDoc | null> => {
     try {
       return await this.userRepository.updateUser(user_id, user);
     } catch (error: unknown) {
@@ -283,7 +285,7 @@ class UserServices implements IUserService {
     filePath: string
   ): Promise<string> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(
+      const userData: UserDoc | null = await this.userRepository.findByUserId(
         user_id
       );
       if (!userData) {
@@ -318,7 +320,7 @@ class UserServices implements IUserService {
       }
 
       const profileURL = result.secure_url;
-      const user: IUser | null = await this.userRepository.profilePicture(
+      const user: UserDoc | null = await this.userRepository.profilePicture(
         user_id,
         profileURL
       );
@@ -337,9 +339,9 @@ class UserServices implements IUserService {
   addRefferalCode = async (
     user_id: string,
     refferalCode: string
-  ): Promise<IUser | null> => {
+  ): Promise<UserDoc | null> => {
     try {
-      const companyData: ICompany | null =
+      const companyData: CompanyDoc | null =
         await this.companyRepository.companyDetailsByRefferal(refferalCode);
       if (!companyData) {
         throw new HttpError(
@@ -348,7 +350,7 @@ class UserServices implements IUserService {
         );
       }
       const companyId: Types.ObjectId = companyData._id;
-      const userData: IUser | null =
+      const userData: UserDoc | null =
         await this.userRepository.addRefferalCodeToUser(
           user_id,
           refferalCode,
@@ -358,12 +360,12 @@ class UserServices implements IUserService {
         throw new HttpError(HTTP_statusCode.NotFound, "User not found");
       }
       const email: string = userData.email;
-      const updatedCompanyData: ICompany | null =
+      const updatedCompanyData: CompanyDoc | null =
         await this.companyRepository.updateJoinedStatus(email);
       if (!updatedCompanyData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No company exists");
       }
-      const userWithoutId: IUser | null =
+      const userWithoutId: UserDoc | null =
         await this.userRepository.userWithoutId(user_id);
       return userWithoutId;
     } catch (error: unknown) {

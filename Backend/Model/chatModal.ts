@@ -1,7 +1,7 @@
-import mongoose, { Schema } from "mongoose";
-import { IMessage } from "../Interfaces/commonInterface";
+import mongoose, { Schema, model, InferSchemaType, Types } from "mongoose";
 
-const messageSchema: Schema = new Schema({
+// Define schema without typing it explicitly
+const messageSchema = new Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Project",
@@ -54,5 +54,9 @@ const messageSchema: Schema = new Schema({
   },
 });
 
-const MessageModel = mongoose.model<IMessage>("Message", messageSchema);
+export type MessageInput = InferSchemaType<typeof messageSchema>;
+export type MessageDoc = MessageInput & {_id:Types.ObjectId}
+
+const MessageModel = model<MessageDoc>("Message", messageSchema);
+
 export default MessageModel;

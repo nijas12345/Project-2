@@ -1,10 +1,4 @@
 import {
-  IAdmin,
-  ICompany,
-  IMember,
-  IPayment,
-  IProject,
-  IUser,
   Projects,
 } from "../Interfaces/commonInterface";
 import { IProjectService } from "../Interfaces/project.service.interface";
@@ -13,12 +7,16 @@ import { IAdminRepository } from "../Interfaces/admin.repository.interface";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { IPaymentRepository } from "../Interfaces/payment.repository.interface";
 import { ICompanyRepository } from "../Interfaces/company.repository.interface";
-import Project from "../Model/projectModal";
+import Project, { MemberDoc, MemberInput, ProjectDoc, ProjectInput } from "../Model/projectModal";
 import { ITaskRepository } from "../Interfaces/task.repository.interface";
 import { IChatRepository } from "../Interfaces/chat.repository.interface";
 import { Types } from "mongoose";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import { AdminDoc } from "../Model/adminModal";
+import { UserDoc } from "../Model/userModal";
+import { CompanyDoc } from "../Model/companyModal";
+import { PaymentDoc } from "../Model/paymentModal";
 
 class ProjectServices implements IProjectService {
   private projectRepository: IProjectRepository;
@@ -39,27 +37,28 @@ class ProjectServices implements IProjectService {
   }
   createProject = async (
     admin_id: string,
-    projectData: IProject
-  ): Promise<IProject | null> => {
+    projectData: ProjectInput
+  ): Promise<ProjectDoc | null> => {
     try {
-      const adminData: IAdmin | null = await this.adminRepository.findByAdminId(admin_id)
+      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(admin_id)
       if (!adminData) {
   throw new HttpError(HTTP_statusCode.NotFound, "Admin not found");
 }
-      const existingProjects:IProject[] = await this.projectRepository.existingProjectByAdminId(admin_id)
+      const existingProjects:ProjectDoc[] = await this.projectRepository.existingProjectByAdminId(admin_id)
       if (existingProjects.length >= 1) {
         const status = "active"
-        const paymentData: IPayment | null = await this.paymentRepository.paymentStatus(admin_id,status)
+        const paymentData: PaymentDoc | null = await this.paymentRepository.paymentStatus(admin_id,status)
         if(paymentData){
           const companyId = adminData.companyId;
           const sameEmail = adminData.email;
-          const companyData:ICompany|null = await this.companyRepository.companyFindById(companyId)
+          if(!companyId) throw new HttpError(HTTP_statusCode.NotFound, "No company data exists")
+          const companyData:CompanyDoc|null = await this.companyRepository.companyFindById(companyId)
           if (!companyData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No company data exists");
       }
           const refferalCode:string = companyData?.refferalCode
           const memberEmails = projectData.members.map((member) => member.email);
-          const existingUsers:IUser[] = await this.userRepository.existingUsers(refferalCode,memberEmails);
+          const existingUsers:UserDoc[] = await this.userRepository.existingUsers(refferalCode,memberEmails);
           const missingEmails = [];
           const existingEmails = new Set(
             existingUsers.map((user) => user.email)
@@ -88,7 +87,7 @@ class ProjectServices implements IProjectService {
             role: member.role,
           }));
           projectData.admin_id = admin_id;
-          const project:IProject = new Project({
+          const project:ProjectInput = new Project({
             name: projectData.name,
             description: projectData.description,
             admin_id: projectData.admin_id,
@@ -103,8 +102,9 @@ class ProjectServices implements IProjectService {
         }
       }else{
         const companyId = adminData.companyId;
+        if(!companyId) throw new Error("No Company Id Exists");
         const sameEmail = adminData.email;
-        const companyData:ICompany|null = await this.companyRepository.companyFindById(companyId);
+        const companyData:CompanyDoc|null = await this.companyRepository.companyFindById(companyId);
         if (!companyData) {
   throw new HttpError(HTTP_statusCode.NotFound, "No company data exists");
 }
@@ -149,15 +149,15 @@ class ProjectServices implements IProjectService {
       throw error;
     }
   };
-  getProjects = async (user_id: string): Promise<Projects[]> => {
+  getProjects = async (user_id: string): Promise<ProjectDoc[]> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(user_id);
+      const userData: UserDoc | null = await this.userRepository.findByUserId(user_id);
       if (!userData) throw new Error("No user Data");
       const email = userData.email;
-      const projects: Projects[] = await this.projectRepository.getProjects(
+      const projects: ProjectDoc[] = await this.projectRepository.getProjects(
         email
       );
-      if (!projects) {
+      if (!projects.length) {
   throw new HttpError(
     HTTP_statusCode.NotFound,
     "Please create a project"
@@ -168,11 +168,11 @@ class ProjectServices implements IProjectService {
       throw error;
     }
   };
-  getAdminProjects = async (admin_id: string): Promise<Projects[]> => {
+  getAdminProjects = async (admin_id: string): Promise<ProjectDoc[]> => {
     try {
-      const projects: Projects[] =
+      const projects: ProjectDoc[] =
         await this.projectRepository.getAdminProjects(admin_id);
-      if (!projects) {
+      if (!projects.length) {
   throw new HttpError(HTTP_statusCode.NotFound, "Please create a project");
 }
       return projects;
@@ -182,16 +182,17 @@ class ProjectServices implements IProjectService {
   };
   updateProject = async (
     admin_id: string,
-    projectData: IProject
-  ): Promise<Projects[]> => {
+    projectData: ProjectDoc
+  ): Promise<ProjectDoc[]> => {
     try {
-      let admin: IAdmin | null = await this.adminRepository.findByAdminId(admin_id);
+      let admin: AdminDoc | null = await this.adminRepository.findByAdminId(admin_id);
       if (!admin) {
   throw new HttpError(HTTP_statusCode.NotFound, "Admin not found");
 }
       const companyId = admin.companyId;
+      if(!companyId) throw new HttpError(HTTP_statusCode.NotFound, "Admin not found")
       const sameEmail = admin.email;
-      const companyData:ICompany|null = await this.companyRepository.companyFindById(companyId);
+      const companyData:CompanyDoc|null = await this.companyRepository.companyFindById(companyId);
      if (!companyData) {
   throw new HttpError(HTTP_statusCode.NotFound, "No company data exists");
 }
@@ -218,7 +219,7 @@ class ProjectServices implements IProjectService {
   `The following emails do not exist in the company: ${missingEmails.join(", ")}`
 );
       }
-      const projectMembers:IMember[] = projectData.members.map((member) => ({
+      const projectMembers:MemberInput[] = projectData.members.map((member) => ({
         email: member.email,
         role: member.role,
       }));
@@ -228,15 +229,9 @@ class ProjectServices implements IProjectService {
 }
       projectData.admin_id = admin_id;
       const name:string = projectData.name
-      const description = projectData.description;
-      const members = projectMembers;
-      const update = {
-        name: projectData.name,
-        description: projectData.description,
-        members: projectMembers,
-        admin_id: projectData.admin_id,
-      };
-      const updateProject:Projects[] = await this.projectRepository.updateProject(admin_id,projectId,name,description,members);
+      const description:string = projectData.description;
+      const members:MemberInput[] = projectMembers;
+      const updateProject:ProjectDoc[] = await this.projectRepository.updateProject(admin_id,projectId,name,description,members);
       return updateProject
     } catch(error:unknown) {
       throw error;
@@ -245,9 +240,9 @@ class ProjectServices implements IProjectService {
   deleteProject = async (
     admin_id: string,
     projectId: string
-  ): Promise<Projects[]> => {
+  ): Promise<ProjectDoc[]> => {
     try {
-      const projects: Projects[] = await this.projectRepository.deleteProject(
+      const projects: ProjectDoc[] = await this.projectRepository.deleteProject(
         admin_id,
         projectId
       );
@@ -257,12 +252,12 @@ class ProjectServices implements IProjectService {
       throw error;
     }
   };
-  projectMembers = async (projectId: string): Promise<IMember[]> => {
+  projectMembers = async (projectId: string): Promise<MemberDoc[]> => {
     try {
-      const projectData: IProject | null =
+      const projectData: ProjectDoc | null =
         await this.projectRepository.projectMembers(projectId);
       if (projectData) {
-        const projectMembers: IMember[] = projectData?.members;
+        const projectMembers: MemberDoc[] = projectData?.members;
         return projectMembers;
       } else {
        throw new HttpError(HTTP_statusCode.NotFound, "The projectId is wrong");
@@ -274,7 +269,7 @@ class ProjectServices implements IProjectService {
   };
   chatProjects = async (user_id: string): Promise<Projects[]> => {
     try {
-      const userData: IUser | null = await this.userRepository.findByUserId(user_id);
+      const userData: UserDoc | null = await this.userRepository.findByUserId(user_id);
           if (!userData) {
               throw new HttpError(HTTP_statusCode.NotFound, "No project data found");
 
@@ -304,21 +299,21 @@ class ProjectServices implements IProjectService {
       throw error;
     }
   };
-  getSelectedProject = async (project: IProject): Promise<IUser[]> => {
+  getSelectedProject = async (project: ProjectDoc): Promise<UserDoc[]> => {
     try {
       const projectId:Types.ObjectId|undefined = project._id
       if (!projectId) {
   throw new HttpError(HTTP_statusCode.BadRequest, "No selected project");
 }
 
-const projectData: IProject | null = await this.projectRepository.findProjectById(projectId);
+const projectData: ProjectDoc | null = await this.projectRepository.findProjectById(projectId);
 if (!projectData) {
   throw new HttpError(HTTP_statusCode.NotFound, "No project data found");
 }
       const memberEmails: string[] = projectData.members.map(
         (member) => member.email
       );
-      const selectedMembers: IUser[] =
+      const selectedMembers: UserDoc[] =
        await this.userRepository.findUsers(memberEmails);
       return selectedMembers;
     } catch(error:unknown) {

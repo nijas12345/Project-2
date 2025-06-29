@@ -1,11 +1,8 @@
 import { Request, Response } from "express";
 import HTTP_statusCode from "../Enums/httpStatusCode";
-import {
-  ICompany,
-  ICompanyMember,
-  IMember,
-  IProject,
-} from "../Interfaces/commonInterface";
+import {  CompanyInput } from "../Model/companyModal";
+import { CompanyMemberDoc } from "../Model/companyModal";
+import { MemberInput, ProjectDoc } from "../Model/projectModal";
 import { ICompanyService } from "../Interfaces/company.service.interface";
 import { HttpStatusCode } from "axios";
 import { handleError } from "../Utils/handleError";
@@ -17,7 +14,7 @@ class CompanyController {
   }
   companyDetails = async (req: Request, res: Response) => {
     try {
-      const companyData = req.body as ICompany;
+      const companyData = req.body as CompanyInput;
       const admin_id = req.admin_id as string;
       const serviceResponse = await this.companyService.companyDetails(
         companyData,
@@ -43,7 +40,7 @@ class CompanyController {
     try {
       const admin_id = req.admin_id as string;
       const searchQuery = req.body.searchQuery as string;
-      const selectedProject = req.body.selectedProject as IProject | null;
+      const selectedProject = req.body.selectedProject as ProjectDoc | null;
       const serviceResponse = await this.companyService.searchMembers(
         admin_id,
         searchQuery,
@@ -67,8 +64,8 @@ class CompanyController {
   invitationUsers = async (req: Request, res: Response) => {
     try {
       const admin_id = req.admin_id as string;
-      const members: IMember[] = req.body.members;
-      const serviceResponse: ICompanyMember[] =
+      const members: MemberInput[] = req.body.members;
+      const serviceResponse: CompanyMemberDoc[] =
         await this.companyService.inviationUsers(admin_id, members);
       console.log("service");
       res.status(HttpStatusCode.Ok).json(serviceResponse);

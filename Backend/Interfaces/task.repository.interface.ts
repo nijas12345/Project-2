@@ -1,22 +1,22 @@
 import { Types } from "mongoose"
-import { IAdmin, IComments, ITask, IUser } from "./commonInterface"
+import { CommentDoc, CommentInput, TaskDoc, TaskInput } from "../Model/taskModal"
 
 export interface ITaskRepository {
-    taskFindById(taskId:Types.ObjectId):Promise<ITask|null>
-    taskDetails(taskDetails:ITask):Promise<ITask>
-    showTask(taskId:string):Promise<ITask|null>
-    updateTaskStatus(taskId:string,status:string,projectId:string):Promise<ITask[]>
-    deleteTask(taskId:string):Promise<ITask|null>
+    taskFindById(taskId:Types.ObjectId):Promise<TaskDoc|null>
+    taskDetails(taskDetails:TaskInput):Promise<TaskDoc>
+    showTask(taskId:string):Promise<TaskDoc|null>
+    updateTaskStatus(taskId:string,status:string,projectId:string):Promise<TaskDoc[]>
+    deleteTask(taskId:string):Promise<TaskDoc|null>
     deleteTaskByProjectId(projectId:string):Promise<void>
-    findAllTasks():Promise<ITask[]>
-    adminCountTasks(user_id:string):Promise<ITask[]>
-    editTask(taskId:Types.ObjectId,updateFields:ITask):Promise<ITask|null>
-    adminTasks(admin_id:string,projectId:string|null):Promise<ITask[]>
-    userTasks(email:string,projectId:string|null):Promise<ITask[]>
-    addComment(taskId:string,commentData:IComments):Promise<ITask|null>
-    addAdminComment(taskId:string,commentData:IComments):Promise<ITask|null>
-    deleteComment(id:string):Promise<IComments|null>
-    deleteUserComment(id:string):Promise<IComments|null>
-    assignedStatus(taskId:string,acceptanceStatus:string):Promise<ITask|null>
-    getSearchResults(query:string,projectId:string):Promise<ITask[]>
+    findAllTasks():Promise<TaskDoc[]>
+    adminCountTasks(user_id:string):Promise<TaskDoc[]>
+    editTask(taskId:Types.ObjectId,updateFields:TaskInput):Promise<TaskDoc|null>
+    adminTasks(admin_id:string,projectId:string|null):Promise<TaskDoc[]>
+    userTasks(email:string,projectId:string|null):Promise<TaskDoc[]>
+    addComment(taskId:string,commentData:CommentInput):Promise<TaskDoc|null>
+    addAdminComment(taskId:string,commentData:CommentInput):Promise<TaskDoc|null>
+    deleteComment(id:string):Promise<CommentDoc|null>
+    deleteUserComment(id:string):Promise<CommentDoc|null>
+    assignedStatus(taskId:string,acceptanceStatus:string):Promise<TaskDoc|null>
+    getSearchResults(query:string,projectId:string):Promise<TaskDoc[]>
 }

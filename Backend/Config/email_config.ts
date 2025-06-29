@@ -102,7 +102,6 @@ export const sendInvoiceEmail = async (
   currencyDollar: string,
   invoiceUrl: string
 ) => {
-  const nodemailer = require("nodemailer");
 
   const transporter = nodemailer.createTransport({
     service: "gmail",

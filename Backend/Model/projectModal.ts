@@ -1,7 +1,6 @@
-import mongoose, { Schema } from "mongoose";
-import { IMember, IProject } from "../Interfaces/commonInterface";
+import { Schema ,InferSchemaType,model,Types} from "mongoose";
 
-const memberSchema: Schema = new Schema<IMember>({
+const memberSchema =  new Schema({
   email: {
     type: String,
     required: true,
@@ -12,12 +11,14 @@ const memberSchema: Schema = new Schema<IMember>({
   },
 });
 
-const projectSchema: Schema = new Schema<IProject>({
+const projectSchema =  new Schema({
   name: {
     type: String,
+    required:true
   },
   description: {
     type: String,
+    required:true
   },
   admin_id: {
     type: String,
@@ -35,5 +36,12 @@ const projectSchema: Schema = new Schema<IProject>({
   },
 });
 
-const Project = mongoose.model<IProject>("Project", projectSchema);
-export default Project;
+export type   MemberInput = InferSchemaType<typeof memberSchema>
+export type MemberDoc = MemberInput & {_id:Types.ObjectId}
+
+export type ProjectInput = InferSchemaType<typeof projectSchema>
+export type ProjectDoc = ProjectInput & {_id:Types.ObjectId}
+
+const projectModel = model<ProjectDoc>('Project',projectSchema)
+
+export default projectModel

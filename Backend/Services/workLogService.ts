@@ -1,6 +1,7 @@
 import { IWorkLogService } from "../Interfaces/worklog.service.interface";
 import { IWorkLogRepository } from "../Interfaces/worklog.repository.inteface";
-import { IWorkLog, Statistics } from "../Interfaces/commonInterface";
+import { Statistics } from "../Interfaces/commonInterface";
+import { WorkLogDoc } from "../Model/clockModal";
 
 class WorkLogServices implements IWorkLogService {
   private workLogRepository: IWorkLogRepository;
@@ -21,7 +22,7 @@ class WorkLogServices implements IWorkLogService {
       throw error;
     }
   };
-  clockStatus = async (user_id: string): Promise<IWorkLog | null> => {
+  clockStatus = async (user_id: string): Promise<WorkLogDoc | null> => {
     try {
       return await this.workLogRepository.clockStatus(user_id);
     } catch (error: unknown) {

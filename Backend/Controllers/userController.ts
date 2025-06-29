@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { IUserService } from "../Interfaces/user.service.interface";
-import { IUser } from "../Interfaces/commonInterface";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { HttpError } from "../Utils/HttpError";
 import { handleError } from "../Utils/handleError";
-import { log } from "node:console";
+import { UserDoc } from "../Model/userModal";
 
 class UserController {
   private userService: IUserService;
@@ -14,7 +13,7 @@ class UserController {
   register = async (req: Request, res: Response) => {
     try {
       const refferalCode = req.query.refferalCode as string | null;
-      const userData: IUser = req.body;
+      const userData: UserDoc = req.body;
       userData.refferalCode = refferalCode;
       await this.userService.register(userData);
       res.status(HTTP_statusCode.OK).send("OTP send to mail");
@@ -116,7 +115,7 @@ class UserController {
   updateUser = async (req: Request, res: Response) => {
     try {
       const user_id: string = req.user_id as string;
-      const user: IUser = req.body;
+      const user: UserDoc = req.body;
       const serviceResponse = await this.userService.updateUser(user_id, user);
       console.log(serviceResponse);
       res.status(HTTP_statusCode.OK).json(serviceResponse);

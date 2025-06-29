@@ -1,7 +1,6 @@
-import mongoose, { Schema, model } from "mongoose";
-import { INotification } from "../Interfaces/commonInterface"; // Assuming you have an interface file
+import mongoose, { Schema, InferSchemaType, model, Types } from "mongoose";
 
-const notificationSchema: Schema = new Schema<INotification>({
+const notificationSchema = new Schema({
   admin_id: {
     type: String,
     ref: "Admin",
@@ -20,6 +19,7 @@ const notificationSchema: Schema = new Schema<INotification>({
   isRead: {
     type: Boolean,
     default: false,
+    required:false
   },
   message: {
     type: String,
@@ -28,6 +28,7 @@ const notificationSchema: Schema = new Schema<INotification>({
   createdAt: {
     type: Date,
     default: Date.now,
+    required:false
   },
   notificationType: {
     type: String,
@@ -36,6 +37,9 @@ const notificationSchema: Schema = new Schema<INotification>({
   },
 });
 
-const Notification = model<INotification>("Notification", notificationSchema);
+export type NotificationInput = InferSchemaType<typeof notificationSchema>
+export type NotificationDoc = NotificationInput & {_id:Types.ObjectId}
 
-export default Notification;
+const NotificationModel = model<NotificationDoc>('Notification',notificationSchema)
+
+export default NotificationModel;
