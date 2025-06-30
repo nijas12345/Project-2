@@ -1,6 +1,11 @@
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { UserDoc } from "../Model/userModal";
-import { CommentDoc, CommentInput, TaskDoc, TaskInput } from "../Model/taskModal";
+import {
+  CommentDoc,
+  CommentInput,
+  TaskDoc,
+  TaskInput,
+} from "../Model/taskModal";
 import { ITaskRepository } from "../Interfaces/task.repository.interface";
 import { ITaskService } from "../Interfaces/task.service.interface";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
@@ -30,16 +35,15 @@ class TaskServices implements ITaskService {
       }
 
       const taskId = task._id;
-      const taskDetails: TaskDoc | null = await this.taskRepository.taskFindById(
-        taskId
-      );
+      const taskDetails: TaskDoc | null =
+        await this.taskRepository.taskFindById(taskId);
 
       if (!taskDetails) {
         throw new HttpError(HTTP_statusCode.NotFound, "No task data available");
       }
       if (taskDetails.member == task.member) {
         const updateFields: TaskDoc = {
-          _id:task._id,
+          _id: task._id,
           admin_id: task.admin_id,
           taskName: task.taskName,
           description: task.description,
@@ -64,7 +68,7 @@ class TaskServices implements ITaskService {
         return taskData;
       } else {
         const updateFields: TaskDoc = {
-          _id:task._id,
+          _id: task._id,
           admin_id: task.admin_id,
           taskName: task.taskName,
           description: task.description,
@@ -113,7 +117,7 @@ class TaskServices implements ITaskService {
         );
       }
       if (userData.email == taskData.member) {
-      return taskData;
+        return taskData;
       } else {
         throw new HttpError(
           HTTP_statusCode.NoAccess,
@@ -280,10 +284,8 @@ class TaskServices implements ITaskService {
     commentData: CommentInput
   ): Promise<TaskDoc> => {
     try {
-      const taskData: TaskDoc | null = await this.taskRepository.addAdminComment(
-        taskId,
-        commentData
-      );
+      const taskData: TaskDoc | null =
+        await this.taskRepository.addAdminComment(taskId, commentData);
       if (!taskData) {
         throw new HttpError(
           HTTP_statusCode.NotFound,
@@ -297,7 +299,6 @@ class TaskServices implements ITaskService {
   };
   deleteComment = async (id: string): Promise<CommentDoc> => {
     try {
-
       const result: CommentDoc | null = await this.taskRepository.deleteComment(
         id
       );
@@ -342,16 +343,13 @@ class TaskServices implements ITaskService {
     }
   };
   getSearchResults = async (
-    admin_id:string,
+    admin_id: string,
     query: string,
     projectId: string
   ): Promise<TaskDoc[]> => {
     try {
-      const searchResults: TaskDoc[] = await this.taskRepository.getSearchResults(
-        admin_id,
-        query,
-        projectId
-      );
+      const searchResults: TaskDoc[] =
+        await this.taskRepository.getSearchResults(admin_id, query, projectId);
       return searchResults;
     } catch (error: unknown) {
       throw error;

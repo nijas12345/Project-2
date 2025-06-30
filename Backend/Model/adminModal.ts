@@ -1,9 +1,9 @@
-import { Schema, model , InferSchemaType, Types } from "mongoose";
+import { Schema, model, InferSchemaType, Types } from "mongoose";
 
 const adminSchema = new Schema({
   admin_id: {
     type: String,
-    required:true
+    required: true,
   },
   firstName: {
     type: String,
@@ -45,6 +45,5 @@ const adminSchema = new Schema({
 
 export type AdminInput = InferSchemaType<typeof adminSchema>;
 export type AdminDoc = AdminInput & { _id?: Types.ObjectId };
-const Admin = model<AdminDoc>('Admin',adminSchema);
-export default Admin
-
+const Admin = model<AdminDoc>("Admin", adminSchema);
+export default Admin;

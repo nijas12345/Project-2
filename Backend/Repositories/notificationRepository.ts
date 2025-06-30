@@ -2,10 +2,13 @@ import { Model } from "mongoose";
 import { INotificationRepository } from "../Interfaces/notification.repository.interface";
 import BaseRepository from "./base/baseRepository";
 import { NotificationDoc, NotificationInput } from "../Model/notificationModal";
-class NotificationRepository extends BaseRepository<NotificationDoc> implements INotificationRepository {
+class NotificationRepository
+  extends BaseRepository<NotificationDoc>
+  implements INotificationRepository
+{
   private notificationModel = Model<NotificationDoc>;
   constructor(notificationModel: Model<NotificationDoc>) {
-    super(notificationModel)
+    super(notificationModel);
     this.notificationModel = notificationModel;
   }
   saveNotification = async (
@@ -52,7 +55,9 @@ class NotificationRepository extends BaseRepository<NotificationDoc> implements 
       throw error;
     }
   };
-  getNotificationsCount = async (user_id: string): Promise<NotificationDoc[]> => {
+  getNotificationsCount = async (
+    user_id: string
+  ): Promise<NotificationDoc[]> => {
     try {
       return await this.notificationModel
         .find({ assignedUserId: user_id, notificationType: "User" })

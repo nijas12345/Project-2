@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import HTTP_statusCode from "../Enums/httpStatusCode";
-import {  CompanyInput } from "../Model/companyModal";
+import { CompanyInput } from "../Model/companyModal";
 import { CompanyMemberDoc } from "../Model/companyModal";
 import { MemberInput, ProjectDoc } from "../Model/projectModal";
 import { ICompanyService } from "../Interfaces/company.service.interface";

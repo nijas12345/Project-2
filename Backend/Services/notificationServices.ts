@@ -32,11 +32,10 @@ class NotificationService implements INotificationService {
   ): Promise<{ message: string; assignedUserId: string }> => {
     try {
       console.log(typeof notificationDetails.taskId);
-      
+
       const admin_id: string = notificationDetails.admin_id;
-      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
-        admin_id
-      );
+      const adminData: AdminDoc | null =
+        await this.adminRepository.findByAdminId(admin_id);
       if (!adminData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No Admin data found");
       }
@@ -53,7 +52,7 @@ class NotificationService implements INotificationService {
       const taskId = notificationDetails.taskId;
       const taskData: TaskDoc | null = await this.taskRepository.taskFindById(
         new Types.ObjectId(taskId)
-      );  
+      );
       if (!taskData || !taskData) {
         throw new HttpError(HTTP_statusCode.NotFound, "No task data found");
       }
@@ -149,7 +148,9 @@ class NotificationService implements INotificationService {
       throw error;
     }
   };
-  getNotificationsCount = async (user_id: string): Promise<NotificationDoc[]> => {
+  getNotificationsCount = async (
+    user_id: string
+  ): Promise<NotificationDoc[]> => {
     try {
       const notificationData: NotificationDoc[] =
         await this.notificationRepository.getNotificationsCount(user_id);

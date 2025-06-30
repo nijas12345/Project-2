@@ -18,8 +18,8 @@ class ProjectController {
         projectData
       );
       res.status(200).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   getProjects = async (req: Request, res: Response) => {
@@ -27,8 +27,8 @@ class ProjectController {
       const user_id: string = req.user_id as string;
       const serviceResponse = await this.projectService.getProjects(user_id);
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   getAdminProjects = async (req: Request, res: Response) => {
@@ -38,8 +38,8 @@ class ProjectController {
         admin_id
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   updateProject = async (req: Request, res: Response) => {
@@ -51,8 +51,8 @@ class ProjectController {
         projectData
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   deleteProject = async (req: Request, res: Response) => {
@@ -66,8 +66,8 @@ class ProjectController {
         projectId
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   projectMembers = async (req: Request, res: Response) => {
@@ -77,17 +77,15 @@ class ProjectController {
         projectId
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      
-    }
+    } catch (error: unknown) {}
   };
   chatProjects = async (req: Request, res: Response) => {
     try {
       const user_id = req.user_id as string;
       const serviceResponse = await this.projectService.chatProjects(user_id);
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   AdminchatProjects = async (req: Request, res: Response) => {
@@ -97,8 +95,8 @@ class ProjectController {
         admin_id
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
 

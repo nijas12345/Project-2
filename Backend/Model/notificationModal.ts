@@ -19,7 +19,7 @@ const notificationSchema = new Schema({
   isRead: {
     type: Boolean,
     default: false,
-    required:false
+    required: false,
   },
   message: {
     type: String,
@@ -28,7 +28,7 @@ const notificationSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    required:false
+    required: false,
   },
   notificationType: {
     type: String,
@@ -37,9 +37,12 @@ const notificationSchema = new Schema({
   },
 });
 
-export type NotificationInput = InferSchemaType<typeof notificationSchema>
-export type NotificationDoc = NotificationInput & {_id:Types.ObjectId}
+export type NotificationInput = InferSchemaType<typeof notificationSchema>;
+export type NotificationDoc = NotificationInput & { _id: Types.ObjectId };
 
-const NotificationModel = model<NotificationDoc>('Notification',notificationSchema)
+const NotificationModel = model<NotificationDoc>(
+  "Notification",
+  notificationSchema
+);
 
 export default NotificationModel;

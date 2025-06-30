@@ -5,11 +5,11 @@ import HTTP_statusCode from "../Enums/httpStatusCode";
 import { IPaymentService } from "../Interfaces/payment.service.interface";
 import { handleError } from "../Utils/handleError";
 
-class PaymentController{
-    private paymentService:IPaymentService;
-    constructor(paymentService:IPaymentService){
-        this.paymentService = paymentService;
-    }
+class PaymentController {
+  private paymentService: IPaymentService;
+  constructor(paymentService: IPaymentService) {
+    this.paymentService = paymentService;
+  }
   payment = async (req: Request, res: Response) => {
     try {
       const admin_id = req.admin_id as string;
@@ -20,7 +20,7 @@ class PaymentController{
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
-      handleError(error,res)
+      handleError(error, res);
     }
   };
 
@@ -40,10 +40,10 @@ class PaymentController{
       await this.paymentService.handleWebHook(event);
 
       res.status(HTTP_statusCode.OK).json({ received: true });
-    } catch (error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
 }
 
-export default PaymentController
+export default PaymentController;

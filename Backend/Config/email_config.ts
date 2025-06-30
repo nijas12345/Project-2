@@ -102,7 +102,6 @@ export const sendInvoiceEmail = async (
   currencyDollar: string,
   invoiceUrl: string
 ) => {
-
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

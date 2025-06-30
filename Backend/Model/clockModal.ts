@@ -46,5 +46,8 @@ const workLogSchema = new Schema({
 export type WorkLogInput = InferSchemaType<typeof workLogSchema>;
 export type WorkLogDoc = WorkLogInput & { _id: Types.ObjectId };
 
-export const workLogModel = mongoose.model<WorkLogDoc>("WorkLog", workLogSchema);
+export const workLogModel = mongoose.model<WorkLogDoc>(
+  "WorkLog",
+  workLogSchema
+);
 export default workLogModel;

@@ -1,4 +1,10 @@
-import { Schema, InferSchemaType, model, HydratedDocument, Types } from "mongoose";
+import {
+  Schema,
+  InferSchemaType,
+  model,
+  HydratedDocument,
+  Types,
+} from "mongoose";
 
 // Member Schema
 const memberSchema = new Schema({
@@ -16,15 +22,14 @@ const companySchema = new Schema({
   members: [memberSchema],
 });
 
-
-export type CompanyMemberInput = InferSchemaType<typeof memberSchema>
-export type CompanyMemberDoc = CompanyMemberInput & {_id:Types.ObjectId}
+export type CompanyMemberInput = InferSchemaType<typeof memberSchema>;
+export type CompanyMemberDoc = CompanyMemberInput & { _id: Types.ObjectId };
 export type CompanyInput = InferSchemaType<typeof companySchema>;
-export type CompanyDoc = CompanyInput & {_id:Types.ObjectId}
-export type CompanyUpdateInput = CompanyInput & { _id: Types.ObjectId | string };
-
-
+export type CompanyDoc = CompanyInput & { _id: Types.ObjectId };
+export type CompanyUpdateInput = CompanyInput & {
+  _id: Types.ObjectId | string;
+};
 
 const CompanyModel = model<CompanyDoc>("Company", companySchema);
- 
-export default CompanyModel
+
+export default CompanyModel;

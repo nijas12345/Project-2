@@ -206,9 +206,8 @@ class AdminServices implements IAdminService {
   };
   resetPassword = async (email: string): Promise<void> => {
     try {
-      const adminData: AdminDoc | null = await this.adminRepository.resetPassword(
-        email
-      );
+      const adminData: AdminDoc | null =
+        await this.adminRepository.resetPassword(email);
       console.log("adminData", adminData);
       if (!adminData)
         throw new HttpError(
@@ -302,46 +301,55 @@ class AdminServices implements IAdminService {
       throw error;
     }
   };
-adminProfilePicture = async (
-  admin_id: string,
-  file: Express.Multer.File
-): Promise<string> => {
-  try {
-    const admin = await this.adminRepository.findByAdminId(admin_id);
-    if (!admin) {
-      throw new HttpError(HTTP_statusCode.NotFound, "Admin not found");
-    }
-
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: "uploads"
-    });
-
-    // Delete local file
-    await fsPromises.unlink(file.path);
-    console.log("Local file deleted successfully");
-
-    // Delete old image if exists
-    if (admin.profileImage) {
-      const oldImagePath = path.join(__dirname, "../uploads", admin.profileImage);
-      if (fs.existsSync(oldImagePath)) {
-        await fsPromises.unlink(oldImagePath);
-        console.log("Old profile image deleted");
+  adminProfilePicture = async (
+    admin_id: string,
+    file: Express.Multer.File
+  ): Promise<string> => {
+    try {
+      const admin = await this.adminRepository.findByAdminId(admin_id);
+      if (!admin) {
+        throw new HttpError(HTTP_statusCode.NotFound, "Admin not found");
       }
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: "uploads",
+      });
+
+      // Delete local file
+      await fsPromises.unlink(file.path);
+      console.log("Local file deleted successfully");
+
+      // Delete old image if exists
+      if (admin.profileImage) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../uploads",
+          admin.profileImage
+        );
+        if (fs.existsSync(oldImagePath)) {
+          await fsPromises.unlink(oldImagePath);
+          console.log("Old profile image deleted");
+        }
+      }
+
+      const updatedAdmin = await this.adminRepository.updateProfileImage(
+        admin_id,
+        result.secure_url
+      );
+
+      if (!updatedAdmin) {
+        throw new HttpError(
+          HTTP_statusCode.InternalServerError,
+          "Failed to update admin profile picture"
+        );
+      }
+
+      return updatedAdmin.profileImage;
+    } catch (error: unknown) {
+      throw error;
     }
-
-    const updatedAdmin = await this.adminRepository.updateProfileImage(admin_id, result.secure_url);
-
-    if (!updatedAdmin) {
-      throw new HttpError(HTTP_statusCode.InternalServerError, "Failed to update admin profile picture");
-    }
-
-    return updatedAdmin.profileImage;
-  } catch (error:unknown) {
-    throw error;
-  }
-};
-
+  };
 }
 
 export default AdminServices;

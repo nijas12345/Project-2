@@ -1,34 +1,30 @@
 import { Model } from "mongoose";
-import {
-  IMember,
-} from "../Interfaces/commonInterface";
+import { IMember } from "../Interfaces/commonInterface";
 import { ICompanyRepository } from "../Interfaces/company.repository.interface";
 import { CompanyDoc } from "../Model/companyModal";
 import BaseRepository from "./base/baseRepository";
 
-class CompanyRepository extends BaseRepository<CompanyDoc> implements ICompanyRepository {
-
+class CompanyRepository
+  extends BaseRepository<CompanyDoc>
+  implements ICompanyRepository
+{
   private companyModel = Model<CompanyDoc>;
-  constructor(
-    companyModel: Model<CompanyDoc>,
-  ) {
-    super(companyModel)
+  constructor(companyModel: Model<CompanyDoc>) {
+    super(companyModel);
     this.companyModel = companyModel;
   }
-  existCompanyData = async (companyName: string): Promise<CompanyDoc | null> => {
+  existCompanyData = async (
+    companyName: string
+  ): Promise<CompanyDoc | null> => {
     try {
-      return await this.findOne(
-        { companyName }
-      );
+      return await this.findOne({ companyName });
     } catch (error: unknown) {
       throw error;
     }
   };
   companyDetails = async (companyData: CompanyDoc): Promise<CompanyDoc> => {
     try {
-      return await this.createData(
-        companyData
-      );
+      return await this.createData(companyData);
     } catch (error: unknown) {
       throw error;
     }
@@ -65,7 +61,7 @@ class CompanyRepository extends BaseRepository<CompanyDoc> implements ICompanyRe
   ): Promise<CompanyDoc | null> => {
     try {
       return await this.findOne({
-        refferalCode
+        refferalCode,
       });
     } catch (error: unknown) {
       throw error;
@@ -76,33 +72,31 @@ class CompanyRepository extends BaseRepository<CompanyDoc> implements ICompanyRe
     email: string
   ): Promise<CompanyDoc | null> => {
     try {
-    
-      return  await this.findOneAndUpdate(
-          {
-            refferalCode: refferalCode, // Match the referral code
-            "members.email": email, // Match the email within the members array
-          },
-          {
-            $set: { "members.$.status": "joined" }, // Update the status of the matching member
-          },
-          { new: true } // Return the updated document
-        );
+      return await this.findOneAndUpdate(
+        {
+          refferalCode: refferalCode, // Match the referral code
+          "members.email": email, // Match the email within the members array
+        },
+        {
+          $set: { "members.$.status": "joined" }, // Update the status of the matching member
+        },
+        { new: true } // Return the updated document
+      );
     } catch (error: unknown) {
       throw error;
     }
   };
   updateJoinedStatus = async (email: string): Promise<CompanyDoc | null> => {
     try {
-      
       return await this.findOneAndUpdate(
-          {
-            "members.email": email,
-          },
-          {
-            $set: { "members.$.status": "joined" },
-          },
-          { new: true }
-        );
+        {
+          "members.email": email,
+        },
+        {
+          $set: { "members.$.status": "joined" },
+        },
+        { new: true }
+      );
     } catch (error: unknown) {
       throw error;
     }

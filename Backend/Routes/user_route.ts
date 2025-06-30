@@ -53,36 +53,53 @@ const notificationRepository = new NotificationRepository(Notification);
 const meetingRepository = new MeetingRepository(Meeting);
 const workLogRepository = new WorkLogRepository(WorkLog);
 
-const userService = new UserServices(userRepository,companyRepository);
+const userService = new UserServices(userRepository, companyRepository);
 const userController = new UserController(userService);
 
-const companyService = new CompanyServices(companyRepository,adminRepository,userRepository,projectRepository,paymentRepository);
+const companyService = new CompanyServices(
+  companyRepository,
+  adminRepository,
+  userRepository,
+  projectRepository,
+  paymentRepository
+);
 const companyController = new CompanyController(companyService);
 
-
-const projectService = new ProjectServices(projectRepository,adminRepository,userRepository,paymentRepository,companyRepository,taskRepository,chatRepository);
+const projectService = new ProjectServices(
+  projectRepository,
+  adminRepository,
+  userRepository,
+  paymentRepository,
+  companyRepository,
+  taskRepository,
+  chatRepository
+);
 const projectController = new ProjectController(projectService);
 
-
-
-const taskService = new TaskServices(taskRepository,userRepository);
+const taskService = new TaskServices(taskRepository, userRepository);
 const taskController = new TaskController(taskService);
-
 
 const chatService = new ChatServices(chatRepository);
 const chatController = new ChatController(chatService);
 
-
-const notificationService = new NotificationService(notificationRepository,adminRepository,userRepository,taskRepository);
+const notificationService = new NotificationService(
+  notificationRepository,
+  adminRepository,
+  userRepository,
+  taskRepository
+);
 const notificationController = new NotificationController(notificationService);
 
-
-
-const meetingService = new MeetingServices(meetingRepository,adminRepository,userRepository,projectRepository);
-const meetingController = new MeetingController(meetingService)
+const meetingService = new MeetingServices(
+  meetingRepository,
+  adminRepository,
+  userRepository,
+  projectRepository
+);
+const meetingController = new MeetingController(meetingService);
 
 const workLogService = new WorkLogServices(workLogRepository);
-const workLogController = new WorkLogController(workLogService)
+const workLogController = new WorkLogController(workLogService);
 
 const user_router = Router();
 
@@ -173,8 +190,6 @@ user_router.get(
   workLogController.clockStatistics
 );
 
-
-
 user_router.post(
   "/create-task",
   verifyToken,
@@ -220,7 +235,6 @@ user_router.patch(
   taskController.deleteUserComment
 );
 
-
 user_router.get(
   "/messages/:projectId",
   verifyToken,
@@ -254,7 +268,6 @@ user_router.patch(
   isBlocked,
   meetingController.fetchMeetings
 );
-
 
 user_router.get(
   "/company-info",

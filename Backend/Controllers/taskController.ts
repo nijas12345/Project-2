@@ -257,13 +257,13 @@ class TaskController {
   };
   getSearchResults = async (req: Request, res: Response) => {
     try {
-      const admin_id = req.admin_id as string
+      const admin_id = req.admin_id as string;
       const query = req.query.query as string;
       const projectId = req.query.projectId as string;
       const serviceResponse = await this.taskService.getSearchResults(
         admin_id,
         query,
-        projectId,
+        projectId
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {

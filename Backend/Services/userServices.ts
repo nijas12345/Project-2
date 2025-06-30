@@ -36,7 +36,11 @@ class UserServices implements IUserService {
   login = async (
     email: string,
     password: string
-  ): Promise<{ userData: UserDoc; userToken: string; refreshToken: string }> => {
+  ): Promise<{
+    userData: UserDoc;
+    userToken: string;
+    refreshToken: string;
+  }> => {
     try {
       const userData = await this.userRepository.login(email);
       if (!userData) {
@@ -74,10 +78,9 @@ class UserServices implements IUserService {
 
   register = async (userData: UserDoc): Promise<void> => {
     try {
-      const alreadyExists: UserDoc | null = await this.userRepository.findByEmail(
-        userData.email
-      );
-      
+      const alreadyExists: UserDoc | null =
+        await this.userRepository.findByEmail(userData.email);
+
       if (alreadyExists) {
         throw new HttpError(HTTP_statusCode.Conflict, "Email already exists");
       }
@@ -135,7 +138,9 @@ class UserServices implements IUserService {
           throw new HttpError(HTTP_statusCode.NotFound, "No company exist");
         }
       }
-      const response: UserDoc = await this.userRepository.register(this.userData);
+      const response: UserDoc = await this.userRepository.register(
+        this.userData
+      );
       this.otp = null;
       this.userData = null;
       return response;
@@ -169,7 +174,11 @@ class UserServices implements IUserService {
   };
   verifyGoogleAuth = async (
     token: string
-  ): Promise<{ userData: UserDoc; userToken: string; refreshToken: string }> => {
+  ): Promise<{
+    userData: UserDoc;
+    userToken: string;
+    refreshToken: string;
+  }> => {
     try {
       // Attempt to verify the Google token
       const ticket = await client.verifyIdToken({
@@ -272,7 +281,10 @@ class UserServices implements IUserService {
       throw error;
     }
   };
-  updateUser = async (user_id: string, user: UserDoc): Promise<UserDoc | null> => {
+  updateUser = async (
+    user_id: string,
+    user: UserDoc
+  ): Promise<UserDoc | null> => {
     try {
       return await this.userRepository.updateUser(user_id, user);
     } catch (error: unknown) {

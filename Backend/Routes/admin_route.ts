@@ -47,37 +47,53 @@ const chatRepository = new ChatRepository(Message);
 const notificationRepository = new NotificationRepository(Notification);
 const meetingRepository = new MeetingRepository(Meeting);
 
-
-const adminService = new AdminServices(adminRepository,userRepository);
+const adminService = new AdminServices(adminRepository, userRepository);
 const adminController = new AdminController(adminService);
 
-const companyService = new CompanyServices(companyRepository,adminRepository,userRepository,projectRepository,paymentRepository);
+const companyService = new CompanyServices(
+  companyRepository,
+  adminRepository,
+  userRepository,
+  projectRepository,
+  paymentRepository
+);
 const companyController = new CompanyController(companyService);
 
-
-const projectService = new ProjectServices(projectRepository,adminRepository,userRepository,paymentRepository,companyRepository,taskRepository,chatRepository);
+const projectService = new ProjectServices(
+  projectRepository,
+  adminRepository,
+  userRepository,
+  paymentRepository,
+  companyRepository,
+  taskRepository,
+  chatRepository
+);
 const projectController = new ProjectController(projectService);
 
-
 const paymentService = new PaymentService(paymentRepository);
-const paymentController = new PaymentController(paymentService);  
+const paymentController = new PaymentController(paymentService);
 
-
-const taskService = new TaskServices(taskRepository,userRepository);
+const taskService = new TaskServices(taskRepository, userRepository);
 const taskController = new TaskController(taskService);
-
 
 const chatService = new ChatServices(chatRepository);
 const chatController = new ChatController(chatService);
 
-
-const notificationService = new NotificationService(notificationRepository,adminRepository,userRepository,taskRepository);
+const notificationService = new NotificationService(
+  notificationRepository,
+  adminRepository,
+  userRepository,
+  taskRepository
+);
 const notificationController = new NotificationController(notificationService);
 
-
-
-const meetingService = new MeetingServices(meetingRepository,adminRepository,userRepository,projectRepository);
-const meetingController = new MeetingController(meetingService)
+const meetingService = new MeetingServices(
+  meetingRepository,
+  adminRepository,
+  userRepository,
+  projectRepository
+);
+const meetingController = new MeetingController(meetingService);
 
 const admin_router = Router();
 
@@ -187,7 +203,7 @@ admin_router.put(
   "/search-users",
   adminVerifyToken,
   companyController.searchMembers
-)
+);
 admin_router.put("/user-block", adminVerifyToken, adminController.blockUser);
 admin_router.put(
   "/user-unBlock",

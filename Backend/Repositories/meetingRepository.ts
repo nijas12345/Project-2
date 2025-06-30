@@ -4,20 +4,21 @@ import { MeetingDoc } from "../Model/meetingModal";
 import { IMeeting } from "../Interfaces/commonInterface";
 import BaseRepository from "./base/baseRepository";
 
-class MeetingRepository extends BaseRepository<MeetingDoc> implements IMeetingRepository{
-    private meetingModel = Model<MeetingDoc>
-    constructor(meetingModel:Model<MeetingDoc>){
-     super(meetingModel)
-     this.meetingModel = meetingModel
-    }
+class MeetingRepository
+  extends BaseRepository<MeetingDoc>
+  implements IMeetingRepository
+{
+  private meetingModel = Model<MeetingDoc>;
+  constructor(meetingModel: Model<MeetingDoc>) {
+    super(meetingModel);
+    this.meetingModel = meetingModel;
+  }
   scheduleMeetings = async (
-    meetingData:IMeeting
-  ): Promise<MeetingDoc|null> => {
+    meetingData: IMeeting
+  ): Promise<MeetingDoc | null> => {
     try {
-      return await this.meetingModel.create(
-        meetingData
-      );
-    } catch(error:unknown) {
+      return await this.meetingModel.create(meetingData);
+    } catch (error: unknown) {
       throw error;
     }
   };
@@ -29,8 +30,8 @@ class MeetingRepository extends BaseRepository<MeetingDoc> implements IMeetingRe
       return await this.meetingModel.find({
         "members.email": userEmail,
         projectId: projectId,
-      })
-    } catch(error:unknown) {
+      });
+    } catch (error: unknown) {
       throw error;
     }
   };
@@ -42,8 +43,8 @@ class MeetingRepository extends BaseRepository<MeetingDoc> implements IMeetingRe
       return await this.meetingModel.find({
         admin_id: admin_id,
         projectId: projectId,
-      })
-    } catch(error:unknown) {
+      });
+    } catch (error: unknown) {
       throw error;
     }
   };
@@ -52,13 +53,13 @@ class MeetingRepository extends BaseRepository<MeetingDoc> implements IMeetingRe
     status: string
   ): Promise<MeetingDoc | null> => {
     try {
-      return  await this.findOneAndUpdate(
-          {meetingId},
-          {
-            status
-          }
-        );
-    } catch(error:unknown) {
+      return await this.findOneAndUpdate(
+        { meetingId },
+        {
+          status,
+        }
+      );
+    } catch (error: unknown) {
       throw error;
     }
   };

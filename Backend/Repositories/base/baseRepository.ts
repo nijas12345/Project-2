@@ -16,18 +16,17 @@ class BaseRepository<T> {
   // ✅ Create
   createData = async (data: Partial<T>): Promise<T> => {
     try {
-      const createData = 
-       await this.model.create(data);
-       console.log(createData);
-       
-       return createData
+      const createData = await this.model.create(data);
+      console.log(createData);
+
+      return createData;
     } catch (error) {
       throw error;
     }
   };
 
   // ✅ Find one
-   findOne = async (
+  findOne = async (
     filter: FilterQuery<T>,
     projection: ProjectionType<T> = {},
     options: QueryOptions = {}
@@ -68,13 +67,13 @@ class BaseRepository<T> {
 
   // ✅ Find by ID
   findById = async (
-    id: string|mongoose.Types.ObjectId,
+    id: string | mongoose.Types.ObjectId,
     projection: ProjectionType<T> = {},
     options: QueryOptions = {}
   ): Promise<T | null> => {
     try {
-        const objectId =
-      typeof id === "string" ? new mongoose.Types.ObjectId(id) : id;
+      const objectId =
+        typeof id === "string" ? new mongoose.Types.ObjectId(id) : id;
       return await this.model.findById(objectId, projection, options);
     } catch (error) {
       throw error;

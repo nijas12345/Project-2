@@ -45,22 +45,22 @@ const taskSchema = new Schema({
     type: String,
     enum: ["unAssigned", "active", "reAssigned"],
     default: "unAssigned",
-    required:false
+    required: false,
   },
   status: {
     type: String,
     enum: ["pending", "inProgress", "completed"],
     default: "pending",
-    required:false
+    required: false,
   },
   comments: [commentSchema],
 });
 
-export type CommentInput = InferSchemaType<typeof commentSchema>
-export type CommentDoc = CommentInput & {_id:Types.ObjectId}
+export type CommentInput = InferSchemaType<typeof commentSchema>;
+export type CommentDoc = CommentInput & { _id: Types.ObjectId };
 
-export type TaskInput = InferSchemaType<typeof taskSchema>
-export type TaskDoc = TaskInput & {_id:Types.ObjectId}
+export type TaskInput = InferSchemaType<typeof taskSchema>;
+export type TaskDoc = TaskInput & { _id: Types.ObjectId };
 
 const taskModel = model<TaskDoc>("Task", taskSchema);
 export default taskModel;

@@ -38,10 +38,7 @@ const jwtverifyToken = (
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(accessTokenName, refreshTokenName, expectedRole);
-
       const accessToken: string = req.cookies[accessTokenName];
-      console.log(accessToken);
 
       if (accessToken) {
         jwt.verify(accessToken, secret_key, async (err, decoded) => {
@@ -67,8 +64,6 @@ const jwtverifyToken = (
             if (expectedRole === userRole) {
               req.user_id = user_id;
             } else if (expectedRole === adminRole) {
-              console.log("Helloooo");
-
               req.admin_id = user_id;
             }
             next();
@@ -101,7 +96,6 @@ const handleRefreshToken = async (
   expectedRole: string
 ) => {
   const refreshToken: string = req.cookies[refreshTokenName];
-  console.log("refereseh", refreshToken);
 
   if (refreshToken) {
     jwt.verify(refreshToken, secret_key, (err, decoded) => {
@@ -153,7 +147,6 @@ export const verifyResetPasswordToken = (
 ): { email: string | null; role: string | null } => {
   try {
     const decoded = jwt.verify(token, secret_key) as jwt.JwtPayload;
-    // Return email and role from the decoded token payload
     return {
       email: decoded.email || null,
       role: decoded.role || null, // Assuming `role` is part of the payload

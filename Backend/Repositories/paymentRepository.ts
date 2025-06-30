@@ -3,10 +3,13 @@ import { IPaymentRepository } from "../Interfaces/payment.repository.interface";
 import { PaymentDoc } from "../Model/paymentModal";
 import BaseRepository from "./base/baseRepository";
 
-class PaymentRepository extends BaseRepository<PaymentDoc> implements IPaymentRepository {
+class PaymentRepository
+  extends BaseRepository<PaymentDoc>
+  implements IPaymentRepository
+{
   private paymentModel = Model<PaymentDoc>;
   constructor(paymentModel: Model<PaymentDoc>) {
-    super(paymentModel)
+    super(paymentModel);
     this.paymentModel = paymentModel;
   }
   payment = async (
@@ -16,7 +19,7 @@ class PaymentRepository extends BaseRepository<PaymentDoc> implements IPaymentRe
     customer: string
   ): Promise<void> => {
     try {
-       await this.paymentModel.create({
+      await this.paymentModel.create({
         admin_id,
         subscription,
         amount,
@@ -35,7 +38,7 @@ class PaymentRepository extends BaseRepository<PaymentDoc> implements IPaymentRe
     try {
       return await this.findOne({
         admin_id,
-        status
+        status,
       });
     } catch (error) {
       throw error;
@@ -58,7 +61,7 @@ class PaymentRepository extends BaseRepository<PaymentDoc> implements IPaymentRe
     try {
       return await this.findOne({
         admin_id,
-        status: "active"
+        status: "active",
       });
     } catch (error: unknown) {
       throw error;

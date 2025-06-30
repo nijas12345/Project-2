@@ -1,6 +1,6 @@
 import { IChatRepository } from "../Interfaces/chat.repository.interface";
 import { IChatService } from "../Interfaces/chat.service.interface";
-import { MessageDoc, MessageInput } from "../Model/chatModal"; 
+import { MessageDoc, MessageInput } from "../Model/chatModal";
 
 class ChatServices implements IChatService {
   private chatRepository: IChatRepository;

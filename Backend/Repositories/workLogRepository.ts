@@ -6,10 +6,13 @@ import HTTP_statusCode from "../Enums/httpStatusCode";
 import { WorkLogDoc, WorkLogInput } from "../Model/clockModal";
 import BaseRepository from "./base/baseRepository";
 
-class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRepository {
+class WorkLogRepository
+  extends BaseRepository<WorkLogDoc>
+  implements IWorkLogRepository
+{
   private workLog = Model<WorkLogDoc>;
   constructor(workLog: Model<WorkLogDoc>) {
-    super(workLog)
+    super(workLog);
     this.workLog = workLog;
   }
   clockIn = async (user_id: string): Promise<Date | number> => {
@@ -24,12 +27,11 @@ class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRe
       });
       if (existingClockData) {
         const newClockInTime: Date = new Date();
-        const updatedClockData: WorkLogDoc | null =
-          await this.findOneAndUpdate(
-            { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-            { $set: { clockIn: newClockInTime, isClockedIn: true } },
-            { new: true }
-          );
+        const updatedClockData: WorkLogDoc | null = await this.findOneAndUpdate(
+          { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+          { $set: { clockIn: newClockInTime, isClockedIn: true } },
+          { new: true }
+        );
         return updatedClockData ? updatedClockData.workDuration : 0;
       } else {
         const now = new Date();
@@ -80,18 +82,17 @@ class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRe
       const newWorkDuration: number =
         existingClockData.workDuration + differenceInMs;
 
-      const updatedClockData: WorkLogDoc | null =
-        await this.findOneAndUpdate(
-          { user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-          {
-            $set: {
-              clockOut: now,
-              workDuration: newWorkDuration,
-              isClockedIn: false,
-            },
+      const updatedClockData: WorkLogDoc | null = await this.findOneAndUpdate(
+        { user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+        {
+          $set: {
+            clockOut: now,
+            workDuration: newWorkDuration,
+            isClockedIn: false,
           },
-          { new: true }
-        );
+        },
+        { new: true }
+      );
 
       return updatedClockData ? updatedClockData.workDuration : 0;
     } catch (error: unknown) {
@@ -115,22 +116,21 @@ class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRe
       if (existingClockData.isClockedIn == true) {
         const now = new Date();
         const differenceInMs: number =
-        now.getTime() - existingClockData.clockIn.getTime();
+          now.getTime() - existingClockData.clockIn.getTime();
         console.log("difference", differenceInMs);
         const newWorkDuration: number =
           differenceInMs + existingClockData.workDuration;
-        const updatedClockData: WorkLogDoc | null =
-          await this.findOneAndUpdate(
-            { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-            {
-              $set: {
-                clockOut: now,
-                clockIn: now,
-                workDuration: newWorkDuration,
-              },
+        const updatedClockData: WorkLogDoc | null = await this.findOneAndUpdate(
+          { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+          {
+            $set: {
+              clockOut: now,
+              clockIn: now,
+              workDuration: newWorkDuration,
             },
-            { new: true }
-          );
+          },
+          { new: true }
+        );
         return updatedClockData;
       }
       if (existingClockData.isOnBreak) {
@@ -140,12 +140,11 @@ class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRe
         console.log("difference", differenceInMs);
         const newbreakDuration: number =
           differenceInMs + existingClockData.breakDuration;
-        const updatedClockData: WorkLogDoc | null =
-          await this.findOneAndUpdate(
-            { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-            { $set: { breakStart: now, breakDuration: newbreakDuration } },
-            { new: true }
-          );
+        const updatedClockData: WorkLogDoc | null = await this.findOneAndUpdate(
+          { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+          { $set: { breakStart: now, breakDuration: newbreakDuration } },
+          { new: true }
+        );
         return updatedClockData;
       }
       return existingClockData;
@@ -209,17 +208,17 @@ class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRe
           now.getTime() - existingClockData.breakStart.getTime();
         const newBreakDuration: number =
           existingClockData.breakDuration + differenceInMs;
-          await this.findOneAndUpdate(
-            { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-            {
-              $set: {
-                breakEnd: now,
-                breakDuration: newBreakDuration,
-                isOnBreak: false,
-              },
+        await this.findOneAndUpdate(
+          { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+          {
+            $set: {
+              breakEnd: now,
+              breakDuration: newBreakDuration,
+              isOnBreak: false,
             },
-            { new: true }
-          );
+          },
+          { new: true }
+        );
       }
     } catch (error: unknown) {
       throw error;
@@ -244,35 +243,34 @@ class WorkLogRepository extends BaseRepository<WorkLogDoc> implements IWorkLogRe
         const newWorkDuration: number =
           existingClockData.workDuration + differenceInMs;
 
-        const updatedClockData: WorkLogDoc | null =
-          await this.findOneAndUpdate(
-            { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-            {
-              $set: {
-                clockOut: now,
-                workDuration: newWorkDuration,
-                isClockedIn: false,
-              },
+        const updatedClockData: WorkLogDoc | null = await this.findOneAndUpdate(
+          { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+          {
+            $set: {
+              clockOut: now,
+              workDuration: newWorkDuration,
+              isClockedIn: false,
             },
-            { new: true }
-          );
+          },
+          { new: true }
+        );
       }
       if (existingClockData?.isOnBreak) {
         const differenceInMs: number =
           now.getTime() - existingClockData.breakStart.getTime();
         const newBreakDuration: number =
           existingClockData.breakDuration + differenceInMs;
-          await this.findOneAndUpdate(
-            { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
-            {
-              $set: {
-                breakEnd: now,
-                breakDuration: newBreakDuration,
-                isOnBreak: false,
-              },
+        await this.findOneAndUpdate(
+          { user_id: user_id, date: { $gte: startOfDay, $lte: endOfDay } },
+          {
+            $set: {
+              breakEnd: now,
+              breakDuration: newBreakDuration,
+              isOnBreak: false,
             },
-            { new: true }
-          );
+          },
+          { new: true }
+        );
       }
     } catch (error: unknown) {
       throw error;

@@ -16,7 +16,7 @@ const paymentSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["active","expired","pending","canceled"],
+    enum: ["active", "expired", "pending", "canceled"],
     default: "pending",
   },
   created_at: {
@@ -28,8 +28,8 @@ const paymentSchema = new Schema({
   },
 });
 
-export type PaymentInput = InferSchemaType<typeof paymentSchema>
-export type PaymentDoc = PaymentInput & {_id:Types.ObjectId}
+export type PaymentInput = InferSchemaType<typeof paymentSchema>;
+export type PaymentDoc = PaymentInput & { _id: Types.ObjectId };
 
 const paymentModel = model<PaymentDoc>("Payment", paymentSchema);
-export default paymentModel
+export default paymentModel;

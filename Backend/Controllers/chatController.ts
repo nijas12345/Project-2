@@ -19,16 +19,16 @@ class ChatController {
         (req.query.limit as string) || "5",
         10
       );
-      console.log(limitNumber,pageNumber);
-      
+      console.log(limitNumber, pageNumber);
+
       const serviceResponse = await this.chatService.getChats(
         projectId,
         pageNumber,
         limitNumber
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   getAdminChats = async (req: Request, res: Response) => {
@@ -48,8 +48,8 @@ class ChatController {
         limitNumber
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
 }

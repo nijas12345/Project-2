@@ -49,11 +49,11 @@ const meetingSchema = new Schema({
   members: [memberSchema],
 });
 
-export type MemberInput = InferSchemaType<typeof memberSchema>
-export type MemberDoc = MemberInput & {_id:Types.ObjectId};
+export type MemberInput = InferSchemaType<typeof memberSchema>;
+export type MemberDoc = MemberInput & { _id: Types.ObjectId };
 
-export type MeetingInput = InferSchemaType<typeof meetingSchema>
-export type MeetingDoc = MeetingInput & {_id:Types.ObjectId}
+export type MeetingInput = InferSchemaType<typeof meetingSchema>;
+export type MeetingDoc = MeetingInput & { _id: Types.ObjectId };
 
 const MeetingModel = mongoose.model<MeetingDoc>("Meeting", meetingSchema);
 export default MeetingModel;

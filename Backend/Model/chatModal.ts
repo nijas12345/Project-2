@@ -55,7 +55,7 @@ const messageSchema = new Schema({
 });
 
 export type MessageInput = InferSchemaType<typeof messageSchema>;
-export type MessageDoc = MessageInput & {_id:Types.ObjectId}
+export type MessageDoc = MessageInput & { _id: Types.ObjectId };
 
 const MessageModel = model<MessageDoc>("Message", messageSchema);
 

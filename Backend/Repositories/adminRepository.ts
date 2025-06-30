@@ -4,10 +4,13 @@ import { Types } from "mongoose";
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
 import BaseRepository from "./base/baseRepository";
 
-class AdminRepository extends BaseRepository<AdminDoc> implements IAdminRepository {
+class AdminRepository
+  extends BaseRepository<AdminDoc>
+  implements IAdminRepository
+{
   private adminModel = Model<AdminDoc>;
   constructor(adminModel: Model<AdminDoc>) {
-    super(adminModel)
+    super(adminModel);
     this.adminModel = adminModel;
   }
   findByEmail = async (email: string): Promise<AdminDoc | null> => {
@@ -26,10 +29,7 @@ class AdminRepository extends BaseRepository<AdminDoc> implements IAdminReposito
   };
   login = async (email: string): Promise<AdminDoc | null> => {
     try {
-       return await this.findOne(
-        { email },
-        { _id: 0 } 
-      );
+      return await this.findOne({ email }, { _id: 0 });
     } catch (error: unknown) {
       throw error;
     }
@@ -67,10 +67,7 @@ class AdminRepository extends BaseRepository<AdminDoc> implements IAdminReposito
     password: string
   ): Promise<void> => {
     try {
-      await this.findOneAndUpdate(
-      { email },
-      { $set: { password: password } }
-    );
+      await this.findOneAndUpdate({ email }, { $set: { password: password } });
     } catch (error: unknown) {
       throw error;
     }
@@ -91,7 +88,7 @@ class AdminRepository extends BaseRepository<AdminDoc> implements IAdminReposito
     try {
       return await this.findOneAndUpdate(
         { admin_id },
-  { $set: { profileImage: profileURL } },
+        { $set: { profileImage: profileURL } }
       );
     } catch (error: unknown) {
       throw error;
@@ -104,17 +101,17 @@ class AdminRepository extends BaseRepository<AdminDoc> implements IAdminReposito
   ): Promise<AdminDoc | null> => {
     try {
       return await this.findOneAndUpdate(
-          { admin_id },
-          {
-            firstName: admin.firstName,
-            lastName: admin.lastName,
-            phone: admin.phone,
-            address: admin.address,
-            position: admin.position,
-            city: admin.city,
-            state: admin.state,
-          },
-        );
+        { admin_id },
+        {
+          firstName: admin.firstName,
+          lastName: admin.lastName,
+          phone: admin.phone,
+          address: admin.address,
+          position: admin.position,
+          city: admin.city,
+          state: admin.state,
+        }
+      );
     } catch (error: unknown) {
       throw error;
     }
@@ -127,8 +124,8 @@ class AdminRepository extends BaseRepository<AdminDoc> implements IAdminReposito
       return await this.findOneAndUpdate(
         { admin_id },
         {
-          companyId
-        },
+          companyId,
+        }
       );
     } catch (error: unknown) {
       throw error;

@@ -1,10 +1,10 @@
 import mongoose, { InferSchemaType, Schema, Types, model } from "mongoose";
 import { IUser } from "../Interfaces/commonInterface";
 
-const userSchema= new Schema({
+const userSchema = new Schema({
   user_id: {
     type: String,
-    required:true
+    required: true,
   },
   firstName: {
     type: String,
@@ -37,8 +37,8 @@ const userSchema= new Schema({
   state: {
     type: String,
   },
-  city:{
-    type:String,
+  city: {
+    type: String,
   },
   companyId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -56,9 +56,9 @@ const userSchema= new Schema({
   },
 });
 
-export type UserInput = InferSchemaType<typeof userSchema>
-export type UserDoc = UserInput & {_id?:Types.ObjectId};
+export type UserInput = InferSchemaType<typeof userSchema>;
+export type UserDoc = UserInput & { _id?: Types.ObjectId };
 
-const userModel = model<UserDoc>("User",userSchema);
+const userModel = model<UserDoc>("User", userSchema);
 
-export default userModel
+export default userModel;

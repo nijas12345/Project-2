@@ -158,7 +158,7 @@ class AdminController {
   };
   unBlockUser = async (req: Request, res: Response) => {
     try {
-      const { user_id } = req.body ;
+      const { user_id } = req.body;
       const serviceResponse = await this.adminService.userUnBlock(user_id);
       res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {

@@ -1,8 +1,5 @@
 import { IAdminRepository } from "../Interfaces/admin.repository.interface";
-import {
-  IMeeting,
-  IMember,
-} from "../Interfaces/commonInterface";
+import { IMeeting, IMember } from "../Interfaces/commonInterface";
 import { IMeetingRepository } from "../Interfaces/meeting.repository.interface";
 import { IMeetingService } from "../Interfaces/meeting.service.interface";
 import { IProjectRepository } from "../Interfaces/project.repository.interface";
@@ -39,9 +36,8 @@ class MeetingServices implements IMeetingService {
         throw new HttpError(HTTP_statusCode.NotFound, "No user data found");
       }
       const email: string = userData.email;
-      const projectData: ProjectDoc[] = await this.projectRepository.getMeetings(
-        email
-      );
+      const projectData: ProjectDoc[] =
+        await this.projectRepository.getMeetings(email);
       return projectData;
     } catch (error: unknown) {
       throw error;
@@ -72,11 +68,10 @@ class MeetingServices implements IMeetingService {
         email: member.email,
         role: "Member",
       }));
-      const adminData: AdminDoc | null = await this.adminRepository.findByAdminId(
-        admin_id
-      );
+      const adminData: AdminDoc | null =
+        await this.adminRepository.findByAdminId(admin_id);
       if (!adminData) throw new Error("No Admin Data");
-      const meetingData:IMeeting = {
+      const meetingData: IMeeting = {
         admin_id: admin_id,
         projectId: projectId,
         MeetingTime: meetingTime,

@@ -1,4 +1,4 @@
-import User,{ UserDoc } from "../Model/userModal";
+import User, { UserDoc } from "../Model/userModal";
 import { Request, Response, NextFunction } from "express";
 import UserRepository from "../Repositories/userRepository";
 import HTTP_statusCode from "../Enums/httpStatusCode";
@@ -18,7 +18,9 @@ async function isBloked(
         .json({ message: "Access denied. User ID not found." });
       return;
     }
-    const userData: UserDoc | null = await userRepository.userIsBlocked(user_id);
+    const userData: UserDoc | null = await userRepository.userIsBlocked(
+      user_id
+    );
     if (!userData) throw new Error("No user Data");
     const isBlocked = userData.isBlocked;
     console.log("user is blocked => ", isBlocked);

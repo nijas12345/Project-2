@@ -1,7 +1,10 @@
 import axios from "axios";
 import User from "../Model/userModal"; // Example: Importing a User model
 import cron from "node-cron";
+import dotenv from 'dotenv'
+dotenv.config()
 
+const apiCall = process.env.BACKEND_URL
 // Schedule the cron job to run at 11:43:55 PM daily
 const startCronJob = () => {
   cron.schedule("59 23 * * *", async () => {
@@ -23,7 +26,7 @@ const startCronJob = () => {
 
               // Make the API call with user data
               const response = await axios.post(
-                "http://localhost:8000/schedule-clockStatus",
+                apiCall + "/schedule-clockStatus",
                 {
                   user_id: user.user_id, // Passing user_id from the database
                 }

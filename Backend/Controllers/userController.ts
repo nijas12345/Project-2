@@ -108,8 +108,8 @@ class UserController {
       const password = req.body.password as string;
       await this.userService.confirmResetPassword(token, password);
       res.status(HTTP_statusCode.OK).send();
-    } catch(error:unknown) {
-      handleError(error,res)
+    } catch (error: unknown) {
+      handleError(error, res);
     }
   };
   updateUser = async (req: Request, res: Response) => {

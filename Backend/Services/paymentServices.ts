@@ -5,6 +5,8 @@ import { IPaymentService } from "../Interfaces/payment.service.interface";
 import { sendInvoiceEmail } from "../Config/email_config";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
+import dotenv from 'dotenv';
+dotenv.config();
 
 class PaymentService implements IPaymentService {
   private paymentRepository: IPaymentRepository;
@@ -43,8 +45,8 @@ class PaymentService implements IPaymentService {
           },
         ],
         mode: "subscription",
-        success_url: `https://projecx.online/admin/success`,
-        cancel_url: `https://projecx.online/admin/cancel?subscription=${subscription}`,
+        success_url: `${process.env.CLIENT_SUCCESS_URL}`,
+        cancel_url: `${process.env.CLIENT_CANCEL_URL}?subscription=${subscription}`,
         metadata: {
           subscription: subscription, // Store the subscription plan type ('pro' or 'basic')
           admin_id: admin_id, // Store the admin ID

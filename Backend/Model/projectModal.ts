@@ -1,6 +1,6 @@
-import { Schema ,InferSchemaType,model,Types} from "mongoose";
+import { Schema, InferSchemaType, model, Types } from "mongoose";
 
-const memberSchema =  new Schema({
+const memberSchema = new Schema({
   email: {
     type: String,
     required: true,
@@ -11,14 +11,14 @@ const memberSchema =  new Schema({
   },
 });
 
-const projectSchema =  new Schema({
+const projectSchema = new Schema({
   name: {
     type: String,
-    required:true
+    required: true,
   },
   description: {
     type: String,
-    required:true
+    required: true,
   },
   admin_id: {
     type: String,
@@ -36,12 +36,12 @@ const projectSchema =  new Schema({
   },
 });
 
-export type   MemberInput = InferSchemaType<typeof memberSchema>
-export type MemberDoc = MemberInput & {_id:Types.ObjectId}
+export type MemberInput = InferSchemaType<typeof memberSchema>;
+export type MemberDoc = MemberInput & { _id: Types.ObjectId };
 
-export type ProjectInput = InferSchemaType<typeof projectSchema>
-export type ProjectDoc = ProjectInput & {_id:Types.ObjectId}
+export type ProjectInput = InferSchemaType<typeof projectSchema>;
+export type ProjectDoc = ProjectInput & { _id: Types.ObjectId };
 
-const projectModel = model<ProjectDoc>('Project',projectSchema)
+const projectModel = model<ProjectDoc>("Project", projectSchema);
 
-export default projectModel
+export default projectModel;
