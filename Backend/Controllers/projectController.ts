@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { IProjectService } from "../Interfaces/project.service.interface";
 import HTTP_statusCode from "../Enums/httpStatusCode";
-import { IProject } from "../Interfaces/commonInterface";
-import { HttpStatusCode } from "axios";
 import { handleError } from "../Utils/handleError";
 import { ProjectDoc, ProjectInput } from "../Model/projectModal";
 
@@ -78,7 +76,7 @@ class ProjectController {
       const serviceResponse = await this.projectService.projectMembers(
         projectId
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch(error:unknown) {
       
     }
@@ -87,7 +85,7 @@ class ProjectController {
     try {
       const user_id = req.user_id as string;
       const serviceResponse = await this.projectService.chatProjects(user_id);
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch(error:unknown) {
       handleError(error,res)
     }
@@ -98,7 +96,7 @@ class ProjectController {
       const serviceResponse = await this.projectService.AdminchatProjects(
         admin_id
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch(error:unknown) {
       handleError(error,res)
     }
@@ -110,7 +108,7 @@ class ProjectController {
       const serviceResponse = await this.projectService.getSelectedProject(
         project
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error) {
       console.log(error);
     }

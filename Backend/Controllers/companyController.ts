@@ -4,7 +4,6 @@ import {  CompanyInput } from "../Model/companyModal";
 import { CompanyMemberDoc } from "../Model/companyModal";
 import { MemberInput, ProjectDoc } from "../Model/projectModal";
 import { ICompanyService } from "../Interfaces/company.service.interface";
-import { HttpStatusCode } from "axios";
 import { handleError } from "../Utils/handleError";
 
 class CompanyController {
@@ -20,7 +19,7 @@ class CompanyController {
         companyData,
         admin_id
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -31,7 +30,7 @@ class CompanyController {
       const serviceResponse = await this.companyService.companyMembers(
         admin_id
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -47,7 +46,7 @@ class CompanyController {
         selectedProject
       );
       console.log("service", serviceResponse);
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -68,7 +67,7 @@ class CompanyController {
       const serviceResponse: CompanyMemberDoc[] =
         await this.companyService.inviationUsers(admin_id, members);
       console.log("service");
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -78,7 +77,7 @@ class CompanyController {
       const admin_id = req.admin_id as string;
       const email: string = req.body.email;
       await this.companyService.inviteUser(admin_id, email);
-      res.status(HttpStatusCode.Ok).send();
+      res.status(HTTP_statusCode.OK).send();
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -87,7 +86,7 @@ class CompanyController {
     try {
       const admin_id = req.admin_id as string;
       const serviceResponse = await this.companyService.companyInfo(admin_id);
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -96,7 +95,7 @@ class CompanyController {
     try {
       const user_id = req.user_id as string;
       const serviceResponse = await this.companyService.companyName(user_id);
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }

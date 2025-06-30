@@ -64,7 +64,7 @@ export const verifyOtp = async (otp: string) => {
   return response.data;
 };
 
-export const resendOtp = async () => {
+export const resendUserOtp = async () => {
   const response = await axiosInstance.get("/resend-otp");
   return response.data;
 };

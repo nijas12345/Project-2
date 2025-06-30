@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 import { IChatRepository } from "../Interfaces/chat.repository.interface";
 import { LatestMessage, Projects } from "../Interfaces/commonInterface";
-import { MessageDoc } from "../Model/chatModal";
+import { MessageDoc, MessageInput } from "../Model/chatModal";
 import BaseRepository from "./base/baseRepository";
 
 class ChatRepository extends BaseRepository<MessageDoc> implements IChatRepository {
@@ -46,17 +46,18 @@ class ChatRepository extends BaseRepository<MessageDoc> implements IChatReposito
       throw error;
     }
   };
-  saveChats = async (messageDetails: MessageDoc): Promise<MessageDoc> => {
+  saveChats = async (messageDetails: MessageInput): Promise<MessageDoc> => {
     try {
       return this.createData(messageDetails);
     } catch (error: unknown) {
       throw error;
     }
   };
-  saveFiles = async (messageWithFile: MessageDoc): Promise<MessageDoc> => {
+  saveFiles = async (messageWithFile: MessageInput): Promise<MessageDoc> => {
     try {
       // delete messageWithFile._id;
-      return await this.createData(messageWithFile);
+      console.log(messageWithFile);
+      return await this.chatModel.create(messageWithFile);
     } catch (error: unknown) {
       throw error;
     }

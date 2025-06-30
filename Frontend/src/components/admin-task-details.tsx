@@ -33,6 +33,7 @@ import {
   getProjects,
   searchTasks,
 } from "../services/adminApi/adminAuthService";
+import { handleSearch, handleTaskDeleteComment } from "../handler/taskHandler";
 
 const AdminTaskDetails: React.FC<DashBoardProps> = ({ socket }) => {
   const [file, setFile] = useState<File | null>(null);
@@ -59,51 +60,9 @@ const AdminTaskDetails: React.FC<DashBoardProps> = ({ socket }) => {
   const [newComment, setNewComment] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleTaskDeleteComment = async (id: string | undefined) => {
-    try {
-      const isConfirmed = await showDeleteConfirmation();
-
-      if (isConfirmed && id) {
-        const data = await deleteTaskComment(id);
-        setTask(data);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error("Error deleting comment:", error.message);
-      } else {
-        console.error("An unknown error occurred while deleting the comment.");
-      }
-    }
-  };
-
-  const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchTerm(value);
-
-    try {
-      const projectId = selectedProject;
-      if (!projectId) return;
-      const allTasks = await searchTasks(value, projectId);
-
-      const pending: Task[] = allTasks.filter(
-        (task: Task) => task.status === "pending"
-      );
-      const inProgress: Task[] = allTasks.filter(
-        (task: Task) => task.status === "inProgress"
-      );
-      const done: Task[] = allTasks.filter(
-        (task: Task) => task.status === "completed"
-      );
-
-      setPendingTasks(pending);
-      setInProgressTasks(inProgress);
-      setDoneTasks(done);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Search failed:", error.message);
-      }
-    }
-  };
+  function handle(e:React.ChangeEvent<HTMLInputElement>){
+   handleSearch(e, selectedProject, setSearchTerm, setPendingTasks, setInProgressTasks, setDoneTasks)
+  }
   const handleAddComment = () => {
     if (newComment.trim() && adminInfo) {
       setComments((prevComments) => [
@@ -435,7 +394,7 @@ const AdminTaskDetails: React.FC<DashBoardProps> = ({ socket }) => {
               placeholder="Search"
               type="search"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={handle}
             />
           </div>
           <button
@@ -864,7 +823,7 @@ const AdminTaskDetails: React.FC<DashBoardProps> = ({ socket }) => {
                               <button
                                 type="button"
                                 onClick={() =>
-                                  handleTaskDeleteComment(comment._id)
+                                  handleTaskDeleteComment(comment._id,setTask)
                                 }
                                 className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
                               >

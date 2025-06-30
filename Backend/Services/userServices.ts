@@ -1,4 +1,3 @@
-import { ICompany, IUser } from "../Interfaces/commonInterface";
 import { IUserService } from "../Interfaces/user.service.interface";
 import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { v4 as uuidv4 } from "uuid";

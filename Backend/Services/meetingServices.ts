@@ -10,10 +10,9 @@ import { IUserRepository } from "../Interfaces/user.repository.interface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { UserDoc } from "../Model/userModal";
-import { MemberDoc, MemberInput, ProjectDoc } from "../Model/projectModal";
+import { ProjectDoc } from "../Model/projectModal";
 import { AdminDoc } from "../Model/adminModal";
 import { MeetingDoc } from "../Model/meetingModal";
-import mongoose from "mongoose";
 
 class MeetingServices implements IMeetingService {
   private meetingRepository: IMeetingRepository;

@@ -70,14 +70,13 @@ const AdminOtpVerificationPage: React.FC = () => {
 
   // Function to simulate resending the OTP
   const resendOtp = async () => {
+    setOtp("");
+    setCanResend(false);
+    setTimer(initialTimer);
+    setHideOtpExpirationText(false);
+
     try {
-      setOtp("");
-      setCanResend(false);
-      setTimer(initialTimer);
-      setHideOtpExpirationText(false);
-
-      await resendAdminOtp(); // calling the service
-
+      await resendAdminOtp(); 
       toast.success("OTP resent successfully!");
 
       setTimeout(() => {

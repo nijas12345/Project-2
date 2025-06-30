@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 import { IPaymentRepository } from "../Interfaces/payment.repository.interface";
-import paymentModel, { PaymentDoc } from "../Model/paymentModal";
+import { PaymentDoc } from "../Model/paymentModal";
 import BaseRepository from "./base/baseRepository";
 
 class PaymentRepository extends BaseRepository<PaymentDoc> implements IPaymentRepository {

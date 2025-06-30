@@ -68,7 +68,6 @@ const AdminChatPageRight: React.FC<ChatRightbarProps> = ({
         ); // Remove user from typingUsers
       }
     });
-    console.log("moreMessage", hasMoreMessages);
     setHasMoreMessages(false);
     console.log("moreMessage", hasMoreMessages);
 
@@ -171,7 +170,6 @@ const AdminChatPageRight: React.FC<ChatRightbarProps> = ({
       if (selectedFile) {
         console.log("selected", selectedFile);
         const reader = new FileReader();
-        console.log("reader", reader);
 
         reader.onload = () => {
           const fileData = reader.result as string;
@@ -193,7 +191,6 @@ const AdminChatPageRight: React.FC<ChatRightbarProps> = ({
               data: fileData,
             },
           };
-          console.log("messageWithfile", messageWithFile);
 
           setIsNewMessage(true);
           setMessages((prevMessages) => [...prevMessages, messageWithFile]);
@@ -243,7 +240,7 @@ const AdminChatPageRight: React.FC<ChatRightbarProps> = ({
         projectId: selectedProject?._id,
         senderName: adminInfo?.firstName,
       });
-    }, 1000);
+    }, 500);
   };
   const handleFileClick = () => {
     if (fileInputRef.current) {

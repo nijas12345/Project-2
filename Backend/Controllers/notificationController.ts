@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { INotificationService } from "../Interfaces/notification.service.interface";
-import { HttpStatusCode } from "axios";
 import { handleError } from "../Utils/handleError";
 
 class NotificationController {
@@ -15,7 +14,7 @@ class NotificationController {
       const serviceRespone = await this.notificationService.getNotifications(
         user_id
       );
-      res.status(HttpStatusCode.Ok).json(serviceRespone);
+      res.status(HTTP_statusCode.OK).json(serviceRespone);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -25,7 +24,7 @@ class NotificationController {
       const admin_id = req.admin_id as string;
       const serviceRespone =
         await this.notificationService.getAdminNotifications(admin_id);
-      res.status(HttpStatusCode.Ok).json(serviceRespone);
+      res.status(HTTP_statusCode.OK).json(serviceRespone);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -35,7 +34,7 @@ class NotificationController {
       const user_id = req.user_id as string;
       const serviceRespone =
         await this.notificationService.getNotificationsCount(user_id);
-      res.status(HttpStatusCode.Ok).json(serviceRespone);
+      res.status(HTTP_statusCode.OK).json(serviceRespone);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -45,7 +44,7 @@ class NotificationController {
       const admin_id = req.admin_id as string;
       const serviceRespone =
         await this.notificationService.adminNotificationsCount(admin_id);
-      res.status(HttpStatusCode.Ok).json(serviceRespone);
+      res.status(HTTP_statusCode.OK).json(serviceRespone);
     } catch (error: unknown) {
       handleError(error, res);
     }

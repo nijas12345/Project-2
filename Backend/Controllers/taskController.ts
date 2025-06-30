@@ -3,7 +3,6 @@ import { IComments } from "../Interfaces/commonInterface";
 import { ITaskService } from "../Interfaces/task.service.interface";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import cloudinary from "../Config/cloudinary_config";
-import { HttpStatusCode } from "axios";
 import fs from "fs/promises";
 import { handleError } from "../Utils/handleError";
 import { TaskDoc, TaskInput } from "../Model/taskModal";
@@ -28,7 +27,7 @@ class TaskController {
           comments: req.body.comments,
         };
         const serviceResponse = await this.taskService.taskDetails(tasks);
-        res.status(HttpStatusCode.Ok).json(serviceResponse);
+        res.status(HTTP_statusCode.OK).json(serviceResponse);
       } else {
         const result = await cloudinary.uploader.upload(
           file.path,
@@ -58,7 +57,7 @@ class TaskController {
           console.error("Error deleting local file:", deleteError);
         }
         const serviceResponse = await this.taskService.taskDetails(tasks);
-        res.status(HttpStatusCode.Ok).send(serviceResponse);
+        res.status(HTTP_statusCode.OK).send(serviceResponse);
       }
     } catch (error: unknown) {
       handleError(error, res);
@@ -80,7 +79,7 @@ class TaskController {
           comments: req.body.comments,
         };
         const serviceResponse = await this.taskService.editTask(tasks);
-        res.status(HttpStatusCode.Ok).json(serviceResponse);
+        res.status(HTTP_statusCode.OK).json(serviceResponse);
       } else {
         const result = await cloudinary.uploader.upload(
           file.path,
@@ -111,7 +110,7 @@ class TaskController {
           comments: req.body.comments,
         };
         const serviceResponse = await this.taskService.editTask(tasks);
-        res.status(HttpStatusCode.Ok).json(serviceResponse);
+        res.status(HTTP_statusCode.OK).json(serviceResponse);
       }
     } catch (error: unknown) {
       handleError(error, res);
@@ -123,7 +122,7 @@ class TaskController {
       const taskId = req.body.taskId;
       const serviceResponse = await this.taskService.showTask(user_id, taskId);
 
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -139,7 +138,7 @@ class TaskController {
         status,
         projectId
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -148,7 +147,7 @@ class TaskController {
     try {
       const taskId = req.body.taskId as string;
       await this.taskService.deleteTask(taskId);
-      res.status(HttpStatusCode.Ok).send();
+      res.status(HTTP_statusCode.OK).send();
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -157,7 +156,7 @@ class TaskController {
     try {
       const user_id = req.user_id as string;
       const serviceResponse = await this.taskService.countTask(user_id);
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -166,7 +165,7 @@ class TaskController {
     try {
       const admin_id = req.admin_id as string;
       const serviceResponse = await this.taskService.adminCountTasks(admin_id);
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {
       handleError(error, res);
     }
@@ -258,12 +257,13 @@ class TaskController {
   };
   getSearchResults = async (req: Request, res: Response) => {
     try {
+      const admin_id = req.admin_id as string
       const query = req.query.query as string;
       const projectId = req.query.projectId as string;
-
       const serviceResponse = await this.taskService.getSearchResults(
+        admin_id,
         query,
-        projectId
+        projectId,
       );
       res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch (error: unknown) {

@@ -15,11 +15,11 @@ const ChatPageRight: React.FC<ChatRightbarProps> = ({
   selectedProject,
   fetchProjects,
 }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [messageText, setMessageText] = useState("");
   const userInfo = useSelector(
     (state: RootState): UserData | null => state.userAuth.userInfo
   );
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messageText, setMessageText] = useState("");
   const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [isNewMessage, setIsNewMessage] = useState(false); // Added to track initial load
@@ -246,7 +246,7 @@ const ChatPageRight: React.FC<ChatRightbarProps> = ({
         projectId: selectedProject?._id,
         senderName: userInfo?.firstName,
       });
-    }, 1000);
+    }, 500);
   };
 
   return selectedProject ? (

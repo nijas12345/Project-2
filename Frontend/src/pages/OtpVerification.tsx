@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { verifyOtp } from "../services/userApi/userAuthService";
+import { resendUserOtp,verifyOtp } from "../services/userApi/userAuthService";
 
 const OtpVerificationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -64,15 +64,17 @@ const OtpVerificationPage: React.FC = () => {
     }
   };
 
-  // Function to simulate resending the OTP
   const resendOtp = async () => {
     setOtp(""); // Clear the OTP input field
     setCanResend(false); // Disable the "Resend OTP" button until 30 seconds
     setTimer(initialTimer); // Reset the timer to 30 seconds
     setHideOtpExpirationText(false); // Show the OTP expiration text again
     try {
-      const data = await resendOtp();
+      await resendUserOtp();
       toast.success("OTP resent successfully!");
+      setTimeout(() => {
+        setCanResend(true);
+      }, resendDelay * 1000);
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.message === "Too many attempts") {
@@ -86,10 +88,6 @@ const OtpVerificationPage: React.FC = () => {
         toast.error("An unexpected error occurred.");
       }
     }
-    // Reset the resend delay to show after 30 seconds
-    setTimeout(() => {
-      setCanResend(true);
-    }, resendDelay * 1000);
   };
 
   // Update the timer every second

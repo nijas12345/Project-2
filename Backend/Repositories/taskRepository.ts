@@ -1,6 +1,5 @@
 import { Model, Types } from "mongoose";
 import { ITaskRepository } from "../Interfaces/task.repository.interface";
-import { IComments} from "../Interfaces/commonInterface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { CommentDoc, CommentInput, TaskDoc, TaskInput } from "../Model/taskModal";
@@ -274,12 +273,16 @@ class TaskRepository extends BaseRepository<TaskDoc> implements ITaskRepository 
     }
   };
   getSearchResults = async (
+    admin_id:string,
     query: string,
     projectId: string
   ): Promise<TaskDoc[]> => {
     try {
+      console.log("projectId",projectId);
+      
       if (projectId === "unassigned") {
         const searchResults: TaskDoc[] = await this.findAll({
+          admin_id,
           taskName: { $regex: query, $options: "i" },
           acceptanceStatus: "unAssigned",
         });
@@ -288,13 +291,15 @@ class TaskRepository extends BaseRepository<TaskDoc> implements ITaskRepository 
         return searchResults;
       } else if (projectId == "reassigned") {
         const searchResults: TaskDoc[] = await this.findAll({
+          admin_id,
           taskName: { $regex: query, $options: "i" },
           acceptanceStatus: "reAssigned",
         });
 
         return searchResults;
-      } else if (projectId.length > 14) {
+      } else if (projectId.length>14) {
         const searchResults: TaskDoc[] = await this.findAll({
+          admin_id,
           taskName: { $regex: query, $options: "i" },
           projectId: projectId,
           acceptanceStatus: "active",
@@ -302,6 +307,7 @@ class TaskRepository extends BaseRepository<TaskDoc> implements ITaskRepository 
         return searchResults;
       } else {
         const searchResults: TaskDoc[] = await this.findAll({
+          admin_id,
           taskName: { $regex: query, $options: "i" },
           acceptanceStatus: "active",
         });

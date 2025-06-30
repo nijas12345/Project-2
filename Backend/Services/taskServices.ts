@@ -342,11 +342,13 @@ class TaskServices implements ITaskService {
     }
   };
   getSearchResults = async (
+    admin_id:string,
     query: string,
     projectId: string
   ): Promise<TaskDoc[]> => {
     try {
       const searchResults: TaskDoc[] = await this.taskRepository.getSearchResults(
+        admin_id,
         query,
         projectId
       );

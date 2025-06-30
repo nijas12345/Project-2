@@ -1,6 +1,6 @@
 import { Server as SocketServer } from "socket.io";
 import { Server as HttpServer } from "http";
-
+import dotenv from 'dotenv'
 import User from "../Model/userModal";
 import Message from "../Model/chatModal";
 import Task from "../Model/taskModal";
@@ -28,6 +28,8 @@ const notificationService = new NotificationService(
   userRepository,
   taskRepository
 );
+dotenv.config()
+const allowedOrigins = process.env.CORS_ORIGINS?.split(',');
 
 let io: SocketServer;
 let onlineUser: { [key: string]: string } = {};
@@ -36,7 +38,7 @@ let onlineUsers: { [key: string]: string } = {};
 const configSocketIO = (server: HttpServer) => {
   io = new SocketServer(server, {
     cors: {
-      origin: ["https://projecx.online", "http://localhost:5173"],
+      origin: allowedOrigins,
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -106,13 +108,13 @@ const configSocketIO = (server: HttpServer) => {
       try {
         const roomName = `project-${messageWithFile.projectId}`;
         socket.join(roomName);
-
+        
         if (messageWithFile.imageFile) {
-          const { data, name, type } = messageWithFile.imageFile;
+          const { data, name } = messageWithFile.imageFile;
           const uploadResult = await cloudinary.uploader.upload(data, {
             folder: "project_files",
             resource_type: "auto",
-            public_id: name,
+            public_id: name
           });
           messageWithFile.imageFile = {
             name: name,
@@ -120,6 +122,7 @@ const configSocketIO = (server: HttpServer) => {
             url: uploadResult.secure_url,
           };
         }
+        delete messageWithFile._id
         const savedMessage = await chatService.saveFiles(messageWithFile);
 
         socket.to(roomName).emit("receiveImageFile", savedMessage);

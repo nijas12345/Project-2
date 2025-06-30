@@ -18,5 +18,5 @@ export interface ITaskRepository {
     deleteComment(id:string):Promise<CommentDoc|null>
     deleteUserComment(id:string):Promise<CommentDoc|null>
     assignedStatus(taskId:string,acceptanceStatus:string):Promise<TaskDoc|null>
-    getSearchResults(query:string,projectId:string):Promise<TaskDoc[]>
+    getSearchResults(admin_id:string,query:string,projectId:string):Promise<TaskDoc[]>
 }

@@ -4,7 +4,6 @@ import { AdminDoc } from "../Model/adminModal";
 import { CompanyDoc,CompanyInput,CompanyMemberDoc } from "../Model/companyModal";
 import {
   IMember,
-  IPayment,
 } from "../Interfaces/commonInterface";
 import { ICompanyRepository } from "../Interfaces/company.repository.interface";
 import { ICompanyService } from "../Interfaces/company.service.interface";
@@ -14,7 +13,7 @@ import { IPaymentRepository } from "../Interfaces/payment.repository.interface";
 import { HttpError } from "../Utils/HttpError";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { UserDoc } from "../Model/userModal";
-import { MemberInput, ProjectDoc } from "../Model/projectModal";
+import { ProjectDoc } from "../Model/projectModal";
 import { PaymentDoc } from "../Model/paymentModal";
 class CompanyServices implements ICompanyService {
   private companyRepository: ICompanyRepository;

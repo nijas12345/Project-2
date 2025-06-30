@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import HTTP_statusCode from "../Enums/httpStatusCode";
 import { IChatService } from "../Interfaces/chat.service.interface";
-import { HttpStatusCode } from "axios";
 import { handleError } from "../Utils/handleError";
 
 class ChatController {
@@ -20,12 +19,14 @@ class ChatController {
         (req.query.limit as string) || "5",
         10
       );
+      console.log(limitNumber,pageNumber);
+      
       const serviceResponse = await this.chatService.getChats(
         projectId,
         pageNumber,
         limitNumber
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch(error:unknown) {
       handleError(error,res)
     }
@@ -46,7 +47,7 @@ class ChatController {
         pageNumber,
         limitNumber
       );
-      res.status(HttpStatusCode.Ok).json(serviceResponse);
+      res.status(HTTP_statusCode.OK).json(serviceResponse);
     } catch(error:unknown) {
       handleError(error,res)
     }
