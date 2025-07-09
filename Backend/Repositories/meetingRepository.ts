@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 import { IMeetingRepository } from "../Interfaces/meeting.repository.interface";
-import { MeetingDoc } from "../Model/meetingModal";
+import { MeetingDoc, MeetingInput } from "../Model/meetingModal";
 import { IMeeting } from "../Interfaces/commonInterface";
 import BaseRepository from "./base/baseRepository";
 
@@ -14,7 +14,7 @@ class MeetingRepository
     this.meetingModel = meetingModel;
   }
   scheduleMeetings = async (
-    meetingData: IMeeting
+    meetingData: MeetingInput
   ): Promise<MeetingDoc | null> => {
     try {
       return await this.meetingModel.create(meetingData);

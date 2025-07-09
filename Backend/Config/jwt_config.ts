@@ -107,14 +107,11 @@ const handleRefreshToken = async (
         const { user_id, role } = decoded as jwt.JwtPayload;
 
         if (!user_id || role !== expectedRole) {
-          console.log(role);
-          console.log(expectedRole);
 
           return res
             .status(HTTP_statusCode.Unauthorized)
             .json({ message: "Access denied. Token payload invalid." });
         }
-        console.log(user_id, role);
 
         const newAccessToken = createToken(user_id, role);
 
