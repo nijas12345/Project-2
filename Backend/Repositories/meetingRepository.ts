@@ -14,7 +14,7 @@ class MeetingRepository
     this.meetingModel = meetingModel;
   }
   scheduleMeetings = async (
-    meetingData: MeetingInput
+    meetingData: IMeeting
   ): Promise<MeetingDoc | null> => {
     try {
       return await this.meetingModel.create(meetingData);

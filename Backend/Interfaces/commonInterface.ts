@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { Types } from "mongoose"
 
 export interface IMember{
     _id?:mongoose.Types.ObjectId;
@@ -11,7 +11,7 @@ export interface IMeeting {
   startTime?: Date; 
   endTime?: Date;
   duration?: number; 
-  projectId: string;
+  projectId:string|Types.ObjectId;
   MeetingTime: Date; 
   roomId: string; 
   members:IMember[]

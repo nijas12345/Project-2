@@ -1,5 +1,4 @@
 import mongoose, { InferSchemaType, Schema, Types, model } from "mongoose";
-import { IUser } from "../Interfaces/commonInterface";
 
 const userSchema = new Schema({
   user_id: {

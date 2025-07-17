@@ -7,7 +7,7 @@ import BaseRepository from "./base/baseRepository";
 class AdminRepository
   extends BaseRepository<AdminDoc>
   implements IAdminRepository
-{
+{ 
   private adminModel = Model<AdminDoc>;
   constructor(adminModel: Model<AdminDoc>) {
     super(adminModel);
