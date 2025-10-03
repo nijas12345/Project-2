@@ -55,7 +55,6 @@ const AdminLogin: React.FC = () => {
       return;
     }
 
-    // Regex for validating email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
@@ -226,6 +225,7 @@ const AdminLogin: React.FC = () => {
                     <input type="checkbox" className="mr-2" /> Remember me
                   </label> */}
                   <button
+                  type="button"
                     onClick={() => {
                       navigate("/admin/forgot");
                     }}
